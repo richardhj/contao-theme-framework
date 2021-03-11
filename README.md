@@ -79,8 +79,8 @@ and assign them to the layouts accordingly.
 
 ### Do not rename the theme folder
 
-Renaming the theme folder will create a new Contao theme in the database internally. You'll need to re-assign the
-layouts to the pages.
+Renaming the theme folder will create a new Contao theme in the database internally.
+You'll need to re-assign the layouts to the pages.
 
 ### Use twig templates
 
@@ -95,11 +95,12 @@ so that `fe_page.html.twig` templates from different themes do not conflict.
 
 ### Use Webpack Encore to compile your theme assets
 
-The skeleton theme comes with a pre-defined `webpack.config.js` file. The configuration will automatically process your
-asset files from the `assets` folder and generate bundled filed into the `public` folder.
+The skeleton theme comes with a pre-defined `webpack.config.js` file. The configuration
+will automatically process your asset files from the `assets` folder and generate the 
+bundled files into the `public` folder.
 
-Webpack Encore will also provide an `entrypoints.json` in the public folder. To inject your CSS and JS files to the page
-template use the following twig functions:
+Webpack Encore will also provide an `entrypoints.json` in the public folder. To inject
+your CSS and JS files to the page template use the following twig functions:
 
 ```twig
 {{ theme_link_tags('app') }}
@@ -116,9 +117,9 @@ See https://github.com/richardhj/contao-knp-menu for more informaiton.
 
 ### Git-Ignore the public folder
 
-The distributed theme files inside the public folder usually are versioned and contain duplicated information so that
-you do not want to check in those files to version control. Instead, you want to build the theme (`yarn run prod`)
-before deploying.
+The distributed theme files inside the public folder usually are versioned and contain
+duplicated information so that you do not want to check in those files to version control.
+Instead, you want to build the theme (`yarn run prod`) before deploying.
 
 ### Use yarn webspaces to manage multiple themes
 
