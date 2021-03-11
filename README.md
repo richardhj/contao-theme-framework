@@ -82,6 +82,17 @@ and assign them to the layouts accordingly.
 Renaming the theme folder will create a new Contao theme in the database internally. You'll need to re-assign the
 layouts to the pages.
 
+### Use twig templates
+
+You can Twig or PHP templates by your preference. As already mentioned,
+your templates belong to the `templates` folder.
+
+For Twig templates, suffix your file with `.html.twig`, i.e., `fe_page.html.twig`.
+For PHP templates, use the default naming, i.e., `fe_page.html5`.
+
+For Twig templates, the bundle internally makes use of namespaced twig paths,
+so that `fe_page.html.twig` templates from different themes do not conflict.
+
 ### Use Webpack Encore to compile your theme assets
 
 The skeleton theme comes with a pre-defined `webpack.config.js` file. The configuration will automatically process your
