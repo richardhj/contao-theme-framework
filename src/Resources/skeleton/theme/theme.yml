@@ -1,0 +1,6 @@
+theme:
+  name: My theme
+
+  layouts:
+    _default:
+      name: Default layout

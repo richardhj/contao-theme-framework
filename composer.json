@@ -1,0 +1,33 @@
+{
+  "name": "richardhj/contao-theme-framework",
+  "description": "",
+  "type": "contao-bundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Richard Henkenjohann",
+      "email": "richardhenkenjohann@googlemail.com"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/richardhj/contao-theme-framework/issues",
+    "source": "https://github.com/richardhj/contao-theme-framework"
+  },
+  "require": {
+    "php": ">=7.4",
+    "contao/core-bundle": "^4.9",
+    "webmozart/path-util": "^2.3",
+    "symfony/webpack-encore-bundle": "^1.11"
+  },
+  "require-dev": {
+    "contao/manager-plugin": "^2.7"
+  },
+  "autoload": {
+    "psr-4": {
+      "Richardhj\\ContaoThemeFramework\\": "src/"
+    }
+  },
+  "extra": {
+    "contao-manager-plugin": "Richardhj\\ContaoThemeFramework\\ContaoManager\\Plugin"
+  }
+}

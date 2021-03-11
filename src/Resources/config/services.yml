@@ -1,0 +1,50 @@
+services:
+  Richardhj\ContaoThemeFramework\EventListener\SymlinkListener:
+    tags:
+      - { name: kernel.event_listener, event: 'contao.generate_symlinks' }
+    arguments:
+      - '%kernel.project_dir%'
+
+  Richardhj\ContaoThemeFramework\EventListener\LayoutDcaListener:
+    tags:
+      - { name: 'contao.callback', table: 'tl_layout', target: 'config.onload', priority: -1 }
+    arguments:
+      [ '@database_connection' ]
+
+  Richardhj\ContaoThemeFramework\EventListener\ThemeDcaListener:
+    tags:
+      - { name: 'contao.callback', table: 'tl_theme', target: 'config.onload', priority: -1 }
+    arguments:
+      [ '@database_connection' ]
+
+  Richardhj\ContaoThemeFramework\Migration\ThemeMigration:
+    tags: [ 'contao.migration' ]
+    arguments:
+      - '@database_connection'
+      - '%kernel.project_dir%'
+
+  Richardhj\ContaoThemeFramework\Command\CreateThemeCommand:
+    arguments:
+      - '@filesystem'
+      - '%kernel.project_dir%'
+
+  Richardhj\ContaoThemeFramework\Twig\EncoreEntryFilesTwigExtension:
+    arguments:
+      - '@Contao\CoreBundle\BackendTheme\EncoreEntrypointLookupCollection'
+      - '@contao.themes.tag_renderer'
+
+  Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection:
+    arguments:
+      - '%kernel.project_dir%'
+
+  contao.themes.tag_renderer:
+    class: Symfony\WebpackEncoreBundle\Asset\TagRenderer
+    arguments:
+      - '@Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection'
+      - '@assets.packages'
+      - [ ]
+      - [ ]
+      - [ ]
+      - '@event_dispatcher'
+    tags:
+      - { name: 'kernel.reset', method: 'reset' }

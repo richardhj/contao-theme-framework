@@ -1,0 +1,18 @@
+{
+    "private": true,
+    "scripts": {
+        "dev": "node_modules/.bin/encore dev",
+        "watch": "node_modules/.bin/encore dev --watch",
+        "build": "env NODE_ENV=production node_modules/.bin/encore production"
+    },
+    "devDependencies": {
+        "@symfony/webpack-encore": "^1.0.0",
+        "autoprefixer": "^10.2.3",
+        "file-loader": "^6.0.0",
+        "image-webpack-loader": "^7.0.0",
+        "postcss-loader": "^5.0.0",
+        "postcss": "^8.2.8"
+    },
+    "dependencies": {
+    }
+}
