@@ -39,8 +39,9 @@ services:
       - '%kernel.project_dir%'
 
   Richardhj\ContaoThemeFramework\Twig\EncoreEntryFilesTwigExtension:
+    tags: ['twig.extension']
     arguments:
-      - '@Contao\CoreBundle\BackendTheme\EncoreEntrypointLookupCollection'
+      - '@Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection'
       - '@contao.themes.tag_renderer'
 
   Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection:
