@@ -38,7 +38,7 @@ class ThemeMigration implements MigrationInterface
 
     public function getName(): string
     {
-        return 'Install Contao themes from theme.yml';
+        return 'Install Contao themes from theme.yml manifests';
     }
 
     public function shouldRun(): bool
@@ -77,7 +77,9 @@ class ThemeMigration implements MigrationInterface
                 $this->connection->update('tl_theme', $data, ['id' => $themeId]);
             }
 
-            foreach ($theme['layouts'] ?? [] as $layoutName => $layout) {
+            $layouts = $theme['layouts'] ?? [];
+
+            foreach ($layouts as $layoutName => $layout) {
                 $layoutId = $this->connection
                                 ->executeQuery('SELECT id FROM tl_layout WHERE pid=:pid AND alias=:alias', ['pid' => $themeId, 'alias' => $layoutName])
                                 ->fetch(FetchMode::NUMERIC)[0] ?? null;
@@ -85,11 +87,23 @@ class ThemeMigration implements MigrationInterface
                 $data = array_merge($layout, ['alias' => $layoutName, 'pid' => $themeId, 'tstamp' => time()]);
 
                 if (null === $layoutId) {
+                    // For new layouts, enable the article module in the main column
+                    $data = array_merge(
+                        $data,
+                        ['modules' => serialize([['mod' => '0', 'col' => 'main', 'enable' => '1']])]
+                    );
+
                     $this->connection->insert('tl_layout', $data);
                 } else {
                     $this->connection->update('tl_layout', $data, ['id' => $themeId]);
                 }
             }
+
+            $this->connection->executeQuery(
+                'DELETE FROM tl_layout WHERE pid=:pid AND alias NOT IN (:aliases)',
+                ['pid' => $themeId, 'aliases' => array_keys($layouts)],
+                ['aliases' => Connection::PARAM_STR_ARRAY]
+            );
         }
 
         $this->connection->executeQuery(
@@ -107,30 +121,34 @@ class ThemeMigration implements MigrationInterface
     {
         $themes = [];
 
-        $finder = new Finder();
-        $finder->files()->in($this->rootDir.'/themes')->name('theme.yml');
+        $manifests = (new Finder())
+            ->files()
+            ->in($this->rootDir.'/themes')
+            ->name('theme.yml')
+            ->getIterator()
+        ;
 
-        foreach ($finder as $theme) {
-            $config = Yaml::parse($theme->getContents());
+        foreach ($manifests as $manifest) {
+            $config = Yaml::parse($manifest->getContents());
 
-            $themes[$theme->getRelativePath()] = $this->prepareTheme($config['theme'] ?? []);
+            $themes[$manifest->getRelativePath()] = $this->prepareTheme($config['theme'] ?? []);
         }
 
         return $themes;
     }
 
-    private function prepareTheme(array $theme): array
+    private function prepareTheme(array $config): array
     {
-        $defaultLayout = $theme['layouts']['_default'] ?? [];
+        $defaultLayout = $config['layouts']['_default'] ?? [];
 
-        foreach (array_keys($theme['layouts']) as $layout) {
-            if ('_default' === $layout) {
+        foreach (array_keys($config['layouts']) as $layoutName) {
+            if ('_default' === $layoutName) {
                 continue;
             }
 
-            $theme['layouts'][$layout] = array_merge_recursive($defaultLayout, $theme['layouts'][$layout]);
+            $config['layouts'][$layoutName] = array_merge_recursive($defaultLayout, $config['layouts'][$layoutName]);
         }
 
-        return $theme;
+        return $config;
     }
 }

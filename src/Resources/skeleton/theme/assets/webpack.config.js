@@ -4,7 +4,7 @@ Encore
     .setOutputPath('../public')
     .setPublicPath('/themes/my_theme')
     .setManifestKeyPrefix('')
-    .addEntry('js/app', './js/app.js')
+    .addEntry('app', './js/app.js')
     .disableSingleRuntimeChunk()
     .cleanupOutputBeforeBuild()
     .enableSourceMaps(!Encore.isProduction())
