@@ -95,7 +95,7 @@ class ThemeMigration implements MigrationInterface
 
                     $this->connection->insert('tl_layout', $data);
                 } else {
-                    $this->connection->update('tl_layout', $data, ['id' => $themeId]);
+                    $this->connection->update('tl_layout', $data, ['id' => $layoutId]);
                 }
             }
 
