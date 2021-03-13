@@ -43,6 +43,10 @@ class ThemeMigration implements MigrationInterface
 
     public function shouldRun(): bool
     {
+        if (!file_exists($this->rootDir.'/themes')) {
+            return false;
+        }
+
         // Check fields exist
         try {
             $this->connection->executeQuery("SELECT id FROM tl_theme WHERE alias=''");

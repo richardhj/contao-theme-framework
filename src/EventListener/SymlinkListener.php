@@ -30,6 +30,10 @@ class SymlinkListener
 
     public function __invoke(GenerateSymlinksEvent $event)
     {
+        if (!file_exists($this->rootDir.'/themes')) {
+            return;
+        }
+
         $finder = new Finder();
         $finder->directories()->in($this->rootDir.'/themes')->path('public')->depth('== 1');
 
