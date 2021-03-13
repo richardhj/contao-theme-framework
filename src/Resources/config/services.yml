@@ -8,8 +8,6 @@ services:
   Richardhj\ContaoThemeFramework\EventListener\LayoutDcaListener:
     tags:
       - { name: 'contao.callback', table: 'tl_layout', target: 'config.onload', priority: -1 }
-    arguments:
-      [ '@database_connection' ]
 
   Richardhj\ContaoThemeFramework\EventListener\ThemeDcaListener:
     tags:

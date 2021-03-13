@@ -15,20 +15,14 @@ namespace Richardhj\ContaoThemeFramework\EventListener;
 use Contao\CoreBundle\DataContainer\PaletteManipulator;
 use Contao\DataContainer;
 use Contao\Input;
-use Doctrine\DBAL\Connection;
+use Contao\LayoutModel;
+use Contao\ThemeModel;
 
 /**
  * Removes fields from the DCA palettes.
  */
 class LayoutDcaListener
 {
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
-    {
-        $this->connection = $connection;
-    }
-
     public function __invoke($dc): void
     {
         if (!$dc instanceof DataContainer) {
@@ -41,6 +35,16 @@ class LayoutDcaListener
             return;
         }
 
+        $this->alterListView((int) $dc->id);
+    }
+
+    private function alterListView(int $themeId)
+    {
+        $theme = ThemeModel::findByPk($themeId);
+        if (!$theme->alias) {
+            return;
+        }
+
         $GLOBALS['TL_DCA']['tl_layout']['config']['closed'] = true;
 
         unset(
@@ -50,18 +54,16 @@ class LayoutDcaListener
         );
     }
 
-    private function alterEditMask(int $id): void
+    private function alterEditMask(int $layoutId): void
     {
-        $layout = $this->connection
-            ->executeQuery('SELECT id FROM tl_layout WHERE id=:id AND alias IS NOT NULL', ['id' => $id]);
-
-        if (false === $layout->fetchOne()) {
+        $theme = LayoutModel::findByPk($layoutId)->getRelated('pid');
+        if (!$theme->alias) {
             return;
         }
 
         $GLOBALS['TL_DCA']['tl_layout']['fields']['name']['eval']['readonly'] = true;
 
-        PaletteManipulator::create()
+        (new PaletteManipulator())
             ->removeField('rows')
             ->removeField('cols')
             ->removeField('sections')
@@ -86,6 +88,7 @@ class LayoutDcaListener
             ->removeField('minifyMarkup')
             ->removeField('viewport')
             ->removeField('head')
-            ->applyToPalette('default', 'tl_layout');
+            ->applyToPalette('default', 'tl_layout')
+        ;
     }
 }
