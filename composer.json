@@ -23,6 +23,9 @@
   "require-dev": {
     "contao/manager-plugin": "^2.7"
   },
+  "suggest": {
+    "richardhj/contao-knp-menu": "Directly reference navigaiton modules in Twig templates"
+  },
   "autoload": {
     "psr-4": {
       "Richardhj\\ContaoThemeFramework\\": "src/"
