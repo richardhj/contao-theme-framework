@@ -88,14 +88,12 @@ class ThemeMigration implements MigrationInterface
                                 ->executeQuery('SELECT id FROM tl_layout WHERE pid=:pid AND alias=:alias', ['pid' => $themeId, 'alias' => $layoutName])
                                 ->fetch(FetchMode::NUMERIC)[0] ?? null;
 
+                $data = array_merge(['framework' => ''], $layout);
                 $data = array_merge($layout, ['alias' => $layoutName, 'pid' => $themeId, 'tstamp' => time()]);
 
                 if (null === $layoutId) {
                     // For new layouts, enable the article module in the main column
-                    $data = array_merge(
-                        $data,
-                        ['modules' => serialize([['mod' => '0', 'col' => 'main', 'enable' => '1']])]
-                    );
+                    $data = array_merge(['modules' => serialize([['mod' => '0', 'col' => 'main', 'enable' => '1']])], $data);
 
                     $this->connection->insert('tl_layout', $data);
                 } else {
