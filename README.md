@@ -48,7 +48,7 @@ theme:
       rows: 3rw
 
     other_layout:
-      title: Other layout
+      name: Other layout
       template: fe_page_2
 
   image_sizes:
