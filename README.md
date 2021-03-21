@@ -36,14 +36,14 @@ Write your theme manifest:
 # themes/my_theme/theme.yml
 
 theme:
-  title: My cool theme
+  name: My cool theme
 
   layouts:
     # "_default" is a special key.
     # Will create a "default" layout and all other layouts will merge these settings.
     # Using this key is optional.
     _default:
-      title: Default layout
+      name: Default layout
       template: fe_page
       rows: 3rw
 
