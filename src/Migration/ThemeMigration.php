@@ -144,11 +144,12 @@ class ThemeMigration implements MigrationInterface
         $defaultLayout = $config['layouts']['_default'] ?? [];
 
         foreach (array_keys($config['layouts']) as $layoutName) {
-            if ('_default' === $layoutName) {
-                continue;
+            if ('_default' !== $layoutName) {
+                $config['layouts'][$layoutName] = array_merge($defaultLayout, $config['layouts'][$layoutName]);
             }
 
-            $config['layouts'][$layoutName] = array_merge_recursive($defaultLayout, $config['layouts'][$layoutName]);
+            $config['layouts'][$layoutName] =
+                array_map(fn ($v) => \is_array($v) ? serialize($v) : $v, $config['layouts'][$layoutName]);
         }
 
         return $config;
