@@ -78,9 +78,10 @@ and assign them to the layouts accordingly.
 Usage
 -----
 
-### `assets.packages`
+### Assets
 
-Each theme's public folder is registered as asset package. [Learn more about the Asset component.](https://symfony.com/doc/current/components/asset.html)
+Each theme's public folder is registered as `assets.packages` component.
+[Learn more about the Asset component.](https://symfony.com/doc/current/components/asset.html)
 
 You can reference any file inside the theme's public folder with the `{{asset}}` insert tag
 or corresponding twig function. The theme name corresponds to the package name.
