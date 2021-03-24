@@ -75,6 +75,41 @@ and this is automatically done on `composer install`, so you usually should not 
 Login to the Contao backend where you will find the new theme. Create frontend modules (if necessary)
 and assign them to the layouts accordingly.
 
+Usage
+-----
+
+### `assets.packages`
+
+Each theme's public folder is registered as asset package. [Learn more about the Asset component.](https://symfony.com/doc/current/components/asset.html)
+
+You can reference any file inside the theme's public folder with the `{{asset}}` insert tag
+or corresponding twig function. The theme name corresponds to the package name.
+
+A `manifest.json` inside the public folder will be respected.
+Make sure to use `setManifestKeyPrefix('')` in your `webpack.config.js` file then.
+
+Example:
+
+```html
+<!-- HTML5 -->
+{{asset::images/logo.svg::my_theme}}
+
+<!-- Twig -->
+{{ asset('images/logo.svg', 'my_theme') }}
+```
+
+### Encore
+
+When using Encore, you can use the following Twig functions to inject
+your CSS and JS files to the page template (defined via the `entrypoints.json` file):
+
+```twig
+{{ theme_link_tags('app') }}
+{{ theme_script_tags('app') }}
+```
+
+You can find out more about Encore under https://symfony.com/doc/current/frontend.html.
+
 ## Best Practices
 
 ### Do not rename the theme folder
@@ -99,15 +134,8 @@ The skeleton theme comes with a pre-defined `webpack.config.js` file. The config
 will automatically process your asset files from the `assets` folder and generate the 
 bundled files into the `public` folder.
 
-Webpack Encore will also provide an `entrypoints.json` in the public folder. To inject
-your CSS and JS files to the page template use the following twig functions:
-
-```twig
-{{ theme_link_tags('app') }}
-{{ theme_script_tags('app') }}
-```
-
-You can find out more about Encore under https://symfony.com/doc/current/frontend.html.
+Webpack Encore will also provide an `entrypoints.json` in the public folder. This helps
+to easily add the correct JS and CSS files to the current page (see above for usage).
 
 ### Use a KnpMenu for navigation modules
 
