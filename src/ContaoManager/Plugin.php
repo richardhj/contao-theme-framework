@@ -17,6 +17,7 @@ use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
 use Contao\ManagerPlugin\Config\ConfigPluginInterface;
+use Richardhj\ContaoThemeFramework\DependencyInjection\CompilerPass\AddAssetsPackagesPass;
 use Richardhj\ContaoThemeFramework\DependencyInjection\CompilerPass\AddThemeTwigNamespacesPass;
 use Richardhj\ContaoThemeFramework\RichardhjContaoThemeFrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
@@ -36,6 +37,7 @@ class Plugin implements BundlePluginInterface, ConfigPluginInterface
     {
         $loader->load(static function (ContainerBuilder $container): void {
             $container->addCompilerPass(new AddThemeTwigNamespacesPass());
+            $container->addCompilerPass(new AddAssetsPackagesPass());
         });
     }
 }
