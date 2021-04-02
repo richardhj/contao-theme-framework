@@ -20,10 +20,10 @@ Create a folder for your theme under `/themes` with the following structure:
 
 If you do not use a preprocessor, you place all your CSS/JS files into the public folder.
 
-Alternatively, you can use the following command, where `my_theme` is the name of your theme:
+Alternatively, copy the boilerplate folder:
 
 ```bash
-./vendor/bin/contao-console contao:theme:create my_theme
+cp -r vendor/richardhj/contao-theme-framework/src/Resources/skeleton/theme themes/my_theme
 ```
 
 This command will install an opinionated starter theme pack.
@@ -111,6 +111,21 @@ your CSS and JS files to the page template (defined via the `entrypoints.json` f
 
 You can find out more about Encore under https://symfony.com/doc/current/frontend.html.
 
+### Migrate to theme-framework
+
+You can migrate your existing theme and layouts to the theme-framework.
+
+Before running `contao:migrate`:
+
+1. Add a new column named `alias` to the `tl_theme` table and set `'alias' = 'my_theme'`
+(where `my_theme` matches the name of your theme folder).
+
+2. Add a new column named `alias` to the `tl_layout` table and set `'alias' = '_default'`
+(where `_default` matches the name of your layout defined via the manifest file).
+
+3. All layout settings defined via the manifest file will be overriden in the
+`contao:migrate` command. Existing settings won't be touched.
+ 
 ## Best Practices
 
 ### Do not rename the theme folder
