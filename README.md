@@ -165,6 +165,13 @@ The distributed theme files inside the public folder usually are versioned and c
 duplicated information so that you do not want to check in those files to version control.
 Instead, you want to build the theme (`yarn run prod`) before deploying.
 
+### Do not deploy the assets folder
+
+The assets folder with the source files (if present) should be excluded from deployment
+because it most likely contains the node_modules folder next to the source folder.
+In contrast, all other files, like the theme.yml manifest and public and templates folders
+need to be uploaded when deploying.
+
 ### Use yarn webspaces to manage multiple themes
 
 You can make use of [yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/).
