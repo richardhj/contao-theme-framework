@@ -14,14 +14,13 @@ namespace Richardhj\ContaoThemeFramework\EventListener;
 
 use Contao\LayoutModel;
 use Contao\PageModel;
-use Contao\PageRegular;
 
 /**
  * Add the current theme name to page model.
  */
 class PageLayoutListener
 {
-    public function __invoke(PageModel $pageModel, LayoutModel $layout, PageRegular $pageRegular)
+    public function __invoke(PageModel $pageModel, LayoutModel $layout)
     {
         $theme = $layout->getRelated('pid');
         if (null === $theme) {
