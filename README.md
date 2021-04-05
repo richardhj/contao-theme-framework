@@ -2,6 +2,13 @@
 
 A new standardized and database-less way to build frontend themes in Contao.
 
+## Features
+
+- Automatically registers themes and layouts defined via a `theme.yml` manifest file: Almost no database do maintain - easier deployment!
+- Disables all redundant fields from the tl_theme and tl_layout palettes - you define all settings via the manifest file (except for the module includes).
+- Registers a themes' public folder as Asset package, supports file versioning via a `manifest.json`!
+- Out-of-the-box support for Symfony Encore and its `entrypoints.json`!
+
 ## Provide a theme
 
 ### 1. Create a theme folder
@@ -12,9 +19,9 @@ Create a folder for your theme under `/themes` with the following structure:
 |- files
 |- themes
  |- my_theme
-  |- assets     (Optional folder, we recommend to place your CSS/JS files there)
+  |- assets     (Optional folder, we recommend placing your CSS/JS files there)
   |- public     (Distribution folder with your CSS/JS files, will be symlinked into the web/ folder)
-  |- templates  (Overridden Contao templates, for frontend modules etc.pp.)
+  |- templates  (Overridden Contao templates, for frontend modules, etc.pp.)
   |- theme.yml  (Theme manifest)
 ```
 
@@ -40,8 +47,9 @@ theme:
 
   layouts:
     # "_default" is a special key.
-    # Will create a "default" layout and all other layouts will merge these settings.
+    # Will create a "default" layout, and all other layouts will merge these settings.
     # Using this key is optional.
+    # The key:value structure maps the tl_layout structure.
     _default:
       name: Default layout
       template: fe_page
@@ -70,13 +78,38 @@ and this is automatically done on `composer install`, so you usually should not 
 ./vendor/bin/contao-console contao:symlinks
 ```
 
-### 4. Create frontend modules and assign to layouts
+### 4. Create frontend modules and assign them to layouts
 
-Login to the Contao backend where you will find the new theme. Create frontend modules (if necessary)
+Login to the Contao backend, where you will find the new theme. Create frontend modules (if necessary)
 and assign them to the layouts accordingly.
 
 Usage
 -----
+
+### Wait – How do I build a website if all fields are disabled from tl_layout?
+
+Good question!
+
+The layouts in Contao are highly redundant. You don't need to configure a viewport-attribute,
+body-class, etc. via the layout. Just put those changes directly into your fe_page template.
+
+Instead of selecting CSS files and JS files via the layout (which is limited to files within /files),
+directly include your files via the {{asset}} insert tag or twig function (or via Encore, see below).
+Don't use the "custom <head>" or "custom <script>" settings in your layout. Its hard to maintain and
+keep track of. Put those things directly into the template.
+
+Considering these matters of maintainability, it's easier to not configure any settings in the layout.
+Assigning the modules to the layout sections is all you do in the layouts.
+
+If your layouts uses rows and cols, set the corresponding config in the `theme.yml`. For instance,
+`rows: 3rw` enables the header and footer section.
+
+_Using Twig templates (optional):_
+
+In case your header and footer sections only contain static content, you do not have to configure
+those sections in your layout. Just include those sections via Twig includes. For navigation menus,
+you can use a Knp Menu (see below). For a user menu, you can use the [{{ app.user }} variable](https://symfony.com/doc/current/templates.html#the-app-global-variable).
+You will be surprised, how not using modules for the layout significantly enhances maintainability.
 
 ### Assets
 
@@ -123,7 +156,7 @@ Before running `contao:migrate`:
 2. Add a new column named `alias` to the `tl_layout` table and set `'alias' = '_default'`
 (where `_default` matches the name of your layout defined via the manifest file).
 
-3. All layout settings defined via the manifest file will be overriden in the
+3. All layout settings defined via the manifest file will be overridden in the
 `contao:migrate` command. Existing settings won't be touched.
  
 ## Best Practices
@@ -141,7 +174,7 @@ your templates belong to the `templates` folder.
 For Twig templates, suffix your file with `.html.twig`, i.e., `fe_page.html.twig`.
 For PHP templates, use the default naming, i.e., `fe_page.html5`.
 
-For Twig templates, the bundle internally makes use of namespaced twig paths,
+For Twig templates, the bundle internally uses namespaced twig paths
 so that `fe_page.html.twig` templates from different themes do not conflict.
 
 ### Use Webpack Encore to compile your theme assets
@@ -155,9 +188,9 @@ to easily add the correct JS and CSS files to the current page (see above for us
 
 ### Use a KnpMenu for navigation modules
 
-With a KnpMenu you are much more flexible in outputting a navigation whereve you need it on the page.
+With a KnpMenu you are much more flexible in outputting a navigation wherever you need it on the page.
 
-See https://github.com/richardhj/contao-knp-menu for more informaiton.
+See https://github.com/richardhj/contao-knp-menu for more information.
 
 ### Git-Ignore the public folder
 
@@ -167,7 +200,7 @@ Instead, you want to build the theme (`yarn run prod`) before deploying.
 
 ### Do not deploy the assets folder
 
-The assets folder with the source files (if present) should be excluded from deployment
+The assets folder with the source files (if present) should be excluded from the deployment
 because it most likely contains the node_modules folder next to the source folder.
 In contrast, all other files, like the theme.yml manifest and public and templates folders
 need to be uploaded when deploying.
