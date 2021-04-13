@@ -28,8 +28,6 @@ class ThemeMigration implements MigrationInterface
     private Connection $connection;
     private string $rootDir;
 
-    private static bool $installed = false;
-
     public function __construct(Connection $connection, string $rootDir)
     {
         $this->connection = $connection;
@@ -47,82 +45,6 @@ class ThemeMigration implements MigrationInterface
             return false;
         }
 
-        // Check fields exist
-        try {
-            $this->connection->executeQuery("SELECT id FROM tl_theme WHERE alias=''");
-            $this->connection->executeQuery("SELECT id FROM tl_layout WHERE alias=''");
-        } catch (Exception $e) {
-            return false;
-        }
-
-        return !self::$installed;
-    }
-
-    public function run(): MigrationResult
-    {
-        $themes = $this->findThemes();
-
-        foreach ($themes as $themeName => $theme) {
-            $themeId = $this->connection
-                           ->executeQuery('SELECT id FROM tl_theme WHERE alias=:alias', ['alias' => $themeName])
-                           ->fetch(FetchMode::NUMERIC)[0] ?? null;
-
-            $data = [
-                'name' => $theme['name'],
-                'alias' => $themeName,
-                'tstamp' => time(),
-                'templates' => sprintf('themes/%s/templates', $themeName),
-            ];
-
-            if (null === $themeId) {
-                $this->connection->insert('tl_theme', $data);
-                $themeId = $this->connection->lastInsertId();
-            } else {
-                $this->connection->update('tl_theme', $data, ['id' => $themeId]);
-            }
-
-            $layouts = $theme['layouts'] ?? [];
-
-            foreach ($layouts as $layoutName => $layout) {
-                $layoutId = $this->connection
-                                ->executeQuery('SELECT id FROM tl_layout WHERE pid=:pid AND alias=:alias', ['pid' => $themeId, 'alias' => $layoutName])
-                                ->fetch(FetchMode::NUMERIC)[0] ?? null;
-
-                $data = array_merge(['framework' => ''], $layout);
-                $data = array_merge($layout, ['alias' => $layoutName, 'pid' => $themeId, 'tstamp' => time()]);
-
-                if (null === $layoutId) {
-                    // For new layouts, enable the article module in the main column
-                    $data = array_merge(['modules' => serialize([['mod' => '0', 'col' => 'main', 'enable' => '1']])], $data);
-
-                    $this->connection->insert('tl_layout', $data);
-                } else {
-                    $this->connection->update('tl_layout', $data, ['id' => $layoutId]);
-                }
-            }
-
-            $this->connection->executeQuery(
-                'DELETE FROM tl_layout WHERE pid=:pid AND alias NOT IN (:aliases)',
-                ['pid' => $themeId, 'aliases' => array_keys($layouts)],
-                ['aliases' => Connection::PARAM_STR_ARRAY]
-            );
-        }
-
-        $this->connection->executeQuery(
-            'DELETE FROM tl_theme WHERE alias IS NOT NULL AND alias NOT IN (:aliases)',
-            ['aliases' => array_keys($themes)],
-            ['aliases' => Connection::PARAM_STR_ARRAY]
-        );
-
-        self::$installed = true;
-
-        return new MigrationResult(true, sprintf('%d themes installed', \count($themes)));
-    }
-
-    private function findThemes(): array
-    {
-        $themes = [];
-
         $manifests = (new Finder())
             ->files()
             ->in($this->rootDir.'/themes')
@@ -130,13 +52,116 @@ class ThemeMigration implements MigrationInterface
             ->getIterator()
         ;
 
-        foreach ($manifests as $manifest) {
-            $config = Yaml::parse($manifest->getContents());
+        try {
+            // Check fields exist
+            $this->connection->executeQuery("SELECT id FROM tl_theme WHERE alias=''");
+            $this->connection->executeQuery("SELECT id FROM tl_layout WHERE alias=''");
 
-            $themes[$manifest->getRelativePath()] = $this->prepareTheme($config['theme'] ?? []);
+            // Check for manifest changes
+            foreach ($manifests as $manifest) {
+                $manifestHash = md5_file($manifest->getRealPath());
+
+                $persistedHash = $this->connection
+                    ->executeQuery('SELECT manifestHash FROM tl_theme WHERE alias=:alias', [
+                        'alias' => $manifest->getRelativePath(),
+                    ])->fetchColumn();
+
+                if ($persistedHash !== $manifestHash) {
+                    return true;
+                }
+            }
+        } catch (Exception $e) {
+            return false;
         }
 
-        return $themes;
+        return false;
+    }
+
+    public function run(): MigrationResult
+    {
+        $manifests = (new Finder())
+            ->files()
+            ->in($this->rootDir.'/themes')
+            ->name('theme.yml')
+            ->getIterator()
+        ;
+
+        $installed = 0;
+        $aliases = [];
+        foreach ($manifests as $manifest) {
+            $aliases[] = $manifest->getRelativePath();
+
+            $themeName = $manifest->getRelativePath();
+            $config = Yaml::parse($manifest->getContents());
+            $config = $this->prepareTheme($config['theme'] ?? []);
+            $manifestHash = md5_file($manifest->getRealPath());
+
+            $installed += (int) $this->persistTheme($themeName, $config, $manifestHash);
+        }
+
+        $deleted = $this->connection->executeQuery(
+            'DELETE FROM tl_theme WHERE alias IS NOT NULL AND alias NOT IN (:aliases)',
+            ['aliases' => $aliases],
+            ['aliases' => Connection::PARAM_STR_ARRAY]
+        )->rowCount();
+
+        return new MigrationResult(true, sprintf('%d themes installed. %d themes deleted.', $installed, $deleted));
+    }
+
+    private function persistTheme(string $themeName, array $config, string $manifestHash): bool
+    {
+        $row = $this->connection
+                ->executeQuery('SELECT id, manifestHash FROM tl_theme WHERE alias=:alias', ['alias' => $themeName])
+                ->fetch(FetchMode::ASSOCIATIVE);
+
+        if ($manifestHash === $row['manifestHash'] ?? '') {
+            return false;
+        }
+
+        $themeId = $row['id'] ?? null;
+
+        $data = [
+            'name' => $config['name'],
+            'alias' => $themeName,
+            'tstamp' => time(),
+            'templates' => sprintf('themes/%s/templates', $themeName),
+            'manifestHash' => $manifestHash,
+        ];
+
+        if (null === $themeId) {
+            $this->connection->insert('tl_theme', $data);
+            $themeId = $this->connection->lastInsertId();
+        } else {
+            $this->connection->update('tl_theme', $data, ['id' => $themeId]);
+        }
+
+        $layouts = $config['layouts'] ?? [];
+
+        foreach ($layouts as $layoutName => $layout) {
+            $layoutId = $this->connection
+                    ->executeQuery('SELECT id FROM tl_layout WHERE pid=:pid AND alias=:alias', ['pid' => $themeId, 'alias' => $layoutName])
+                    ->fetch(FetchMode::NUMERIC)[0] ?? null;
+
+            $data = array_merge(['framework' => ''], $layout);
+            $data = array_merge($layout, ['alias' => $layoutName, 'pid' => $themeId, 'tstamp' => time()]);
+
+            if (null === $layoutId) {
+                // For new layouts, enable the article module in the main column
+                $data = array_merge(['modules' => serialize([['mod' => '0', 'col' => 'main', 'enable' => '1']])], $data);
+
+                $this->connection->insert('tl_layout', $data);
+            } else {
+                $this->connection->update('tl_layout', $data, ['id' => $layoutId]);
+            }
+        }
+
+        $this->connection->executeQuery(
+            'DELETE FROM tl_layout WHERE pid=:pid AND alias NOT IN (:aliases)',
+            ['pid' => $themeId, 'aliases' => array_keys($layouts)],
+            ['aliases' => Connection::PARAM_STR_ARRAY]
+        );
+
+        return true;
     }
 
     private function prepareTheme(array $config): array
