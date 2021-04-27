@@ -177,6 +177,38 @@ For PHP templates, use the default naming, i.e., `fe_page.html5`.
 For Twig templates, the bundle internally uses namespaced twig paths
 so that `fe_page.html.twig` templates from different themes do not conflict.
 
+#### Twig support under the hood
+
+Contao as of version 4.11 still does not have native Twig support, but native
+Twig support will come in a future Contao version. As for now, Twig support is
+tricky and provided by [m-vo/contao-twig](https://github.com/m-vo/contao-twig).
+
+Twig template can be placed into the directory `TL_ROOT/templates/`. Those 
+templates are loaded without namespace because of the `twig.default_path` setting.
+Those templates can be referenced by `{% include 'my_template.html.twig' %}`
+and will be automatically loaded in the front end.
+
+The templates inside `TL_ROOT/themes/my_theme/templates/` have a namespace prepended.
+The namespace is the name of the folder, i.e. 'my_theme', so that those templates
+can be referenced by using `{% include '@my_theme/my_template.html.twig' %}`
+
+Twig namespacing for frontend themes is necessary, because one can have multiple themes
+in Contao. Contao prioritizes the templates for the currently active theme in the frontend.
+However, one usually don’t need to use the namespace (because Contao automatically
+chooses the correct template) except if one directly references a template via `{% include %}`.
+
+Assume the following config:
+
+```yml
+theme:
+  layouts:
+    custom_layout:
+     name: My Layout
+     template: fe_page_custom
+```
+
+The `fe_page_custom.html.twig` file can be placed either in `TL_ROOT/templates` or `TL_ROOT/themes/my_theme/templates`.
+
 ### Use Webpack Encore to compile your theme assets
 
 The skeleton theme comes with a pre-defined `webpack.config.js` file. The configuration
