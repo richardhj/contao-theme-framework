@@ -113,6 +113,9 @@ class ThemeMigration implements MigrationInterface
         $row = $this->connection
                 ->executeQuery('SELECT id, manifestHash FROM tl_theme WHERE alias=:alias', ['alias' => $themeName])
                 ->fetch(FetchMode::ASSOCIATIVE);
+        
+        // Prevent array-access error when theme not found
+        $row = false === $row ? [] : $row;
 
         if ($manifestHash === $row['manifestHash'] ?? '') {
             return false;
