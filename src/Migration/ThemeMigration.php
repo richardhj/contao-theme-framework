@@ -117,7 +117,7 @@ class ThemeMigration implements MigrationInterface
         // Prevent array-access error when theme not found
         $row = false === $row ? [] : $row;
 
-        if ($manifestHash === $row['manifestHash'] ?? '') {
+        if ($manifestHash === ($row['manifestHash'] ?? '')) {
             return false;
         }
 
