@@ -2,6 +2,8 @@
 
 A new standardized and database-less way to build frontend themes in Contao.
 
+Proposal for https://github.com/contao/contao/issues/2781
+
 ## Features
 
 - Automatically registers themes and layouts defined via a `theme.yml` manifest file: Almost no database do maintain - easier deployment!
