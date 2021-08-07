@@ -17,8 +17,12 @@ use Contao\CoreBundle\Migration\MigrationResult;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\FetchMode;
+use Richardhj\ContaoThemeFramework\Configuration\ThemeManifestConfiguration;
+use Richardhj\ContaoThemeFramework\Configuration\YamlLoader;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\Loader\DelegatingLoader;
+use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Yaml;
 
 /**
  * Persists the themes defined in `themes/foobar/theme.yml` in the database.
@@ -48,7 +52,7 @@ class ThemeMigration implements MigrationInterface
         $manifests = (new Finder())
             ->files()
             ->in($this->rootDir.'/themes')
-            ->name('theme.yml')
+            ->name(['theme.yml', 'theme.yaml', 'theme.xml'])
             ->getIterator()
         ;
 
@@ -82,18 +86,18 @@ class ThemeMigration implements MigrationInterface
         $manifests = (new Finder())
             ->files()
             ->in($this->rootDir.'/themes')
-            ->name('theme.yml')
+            ->name(['theme.yml', 'theme.yaml'])
             ->getIterator()
         ;
 
         $installed = 0;
         $aliases = [];
         foreach ($manifests as $manifest) {
-            $aliases[] = $manifest->getRelativePath();
-
             $themeName = $manifest->getRelativePath();
-            $config = Yaml::parse($manifest->getContents());
-            $config = $this->prepareTheme($config['theme'] ?? []);
+            $aliases[] = $themeName;
+
+            $config = $this->loadManifest($manifest);
+            $config = $this->processManifest($config);
             $manifestHash = md5_file($manifest->getRealPath());
 
             $installed += (int) $this->persistTheme($themeName, $config, $manifestHash);
@@ -113,7 +117,7 @@ class ThemeMigration implements MigrationInterface
         $row = $this->connection
                 ->executeQuery('SELECT id, manifestHash FROM tl_theme WHERE alias=:alias', ['alias' => $themeName])
                 ->fetch(FetchMode::ASSOCIATIVE);
-        
+
         // Prevent array-access error when theme not found
         $row = false === $row ? [] : $row;
 
@@ -124,7 +128,7 @@ class ThemeMigration implements MigrationInterface
         $themeId = $row['id'] ?? null;
 
         $data = [
-            'name' => $config['name'],
+            'name' => $config['theme']['name'],
             'alias' => $themeName,
             'tstamp' => time(),
             'templates' => sprintf('themes/%s/templates', $themeName),
@@ -146,7 +150,7 @@ class ThemeMigration implements MigrationInterface
                     ->fetch(FetchMode::NUMERIC)[0] ?? null;
 
             $data = array_merge(['framework' => ''], $layout);
-            $data = array_merge($layout, ['alias' => $layoutName, 'pid' => $themeId, 'tstamp' => time()]);
+            $data = array_merge($data, ['alias' => $layoutName, 'pid' => $themeId, 'tstamp' => time()]);
 
             if (null === $layoutId) {
                 // For new layouts, enable the article module in the main column
@@ -167,15 +171,20 @@ class ThemeMigration implements MigrationInterface
         return true;
     }
 
-    private function prepareTheme(array $config): array
+    private function loadManifest($manifest)
     {
-        $defaultLayout = $config['layouts']['_default'] ?? [];
+        $loaderResolver = new LoaderResolver([new YamlLoader()]);
+        $delegatingLoader = new DelegatingLoader($loaderResolver);
 
+        return $delegatingLoader->load($manifest->getRealPath());
+    }
+
+    private function processManifest(array $config): array
+    {
+        $config = (new Processor())->processConfiguration(new ThemeManifestConfiguration(), [$config]);
+
+        // Serialize arrays for the DB insert.
         foreach (array_keys($config['layouts']) as $layoutName) {
-            if ('_default' !== $layoutName) {
-                $config['layouts'][$layoutName] = array_merge($defaultLayout, $config['layouts'][$layoutName]);
-            }
-
             $config['layouts'][$layoutName] =
                 array_map(fn ($v) => \is_array($v) ? serialize($v) : $v, $config['layouts'][$layoutName]);
         }

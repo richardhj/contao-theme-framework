@@ -17,6 +17,7 @@
     "php": ">=7.4",
     "contao/core-bundle": "^4.9",
     "mvo/contao-twig": "^1.1",
+    "symfony/config": "^4.4 || ^5.0",
     "webmozart/path-util": "^2.3",
     "symfony/webpack-encore-bundle": "^1.11"
   },
