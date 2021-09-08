@@ -14,6 +14,7 @@ namespace Richardhj\ContaoThemeFramework\Migration;
 
 use Contao\CoreBundle\Migration\MigrationInterface;
 use Contao\CoreBundle\Migration\MigrationResult;
+use Contao\CoreBundle\Twig\Loader\ContaoFilesystemLoaderWarmer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\FetchMode;
@@ -30,12 +31,14 @@ use Symfony\Component\Finder\Finder;
 class ThemeMigration implements MigrationInterface
 {
     private Connection $connection;
+    private ContaoFilesystemLoaderWarmer $filesystemLoaderWarmer;
     private string $rootDir;
 
-    public function __construct(Connection $connection, string $rootDir)
+    public function __construct(Connection $connection, ContaoFilesystemLoaderWarmer $filesystemLoaderWarmer, string $rootDir)
     {
         $this->connection = $connection;
         $this->rootDir = $rootDir;
+        $this->filesystemLoaderWarmer = $filesystemLoaderWarmer;
     }
 
     public function getName(): string
@@ -108,6 +111,8 @@ class ThemeMigration implements MigrationInterface
             ['aliases' => $aliases],
             ['aliases' => Connection::PARAM_STR_ARRAY]
         )->rowCount();
+
+        $this->filesystemLoaderWarmer->refresh();
 
         return new MigrationResult(true, sprintf('%d themes installed. %d themes deleted.', $installed, $deleted));
     }
