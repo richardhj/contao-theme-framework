@@ -15,16 +15,16 @@ Proposal for https://github.com/contao/contao/issues/2781
 
 ### 1. Create a theme folder
 
-Create a folder for your theme under `/themes` with the following structure: 
+Create a folder for your theme under `/themes` with the following structure:
 
 ```text
 |- files
 |- themes
  |- my_theme
-  |- assets     (Optional folder, we recommend placing your CSS/JS files there)
-  |- public     (Distribution folder with your CSS/JS files, will be symlinked into the web/ folder)
-  |- templates  (Overridden Contao templates, for frontend modules, etc.pp.)
-  |- theme.yml  (Theme manifest)
+  |- assets          (Optional folder, we recommend placing your CSS/JS files there)
+  |- public          (Distribution folder with your CSS/JS files, will be symlinked into the web/ folder)
+  |- templates       (Overridden Contao templates, for frontend modules, etc.pp.)
+  |- theme.[yml|xml] (Theme manifest)
 ```
 
 If you do not use a preprocessor, you place all your CSS/JS files into the public folder.
@@ -47,27 +47,29 @@ Write your theme manifest:
 theme:
   name: My cool theme
 
-  layouts:
-    # "_default" is a special key.
-    # Will create a "default" layout, and all other layouts will merge these settings.
-    # Using this key is optional.
-    # The key:value structure maps the tl_layout structure.
-    _default:
-      name: Default layout
-      template: fe_page
-      rows: 3rw
+layouts:
+  # "_default" is a special key.
+  # Will create a "default" layout, and all other layouts will merge these settings.
+  # Using this key is optional.
+  # The key:value structure maps the tl_layout structure.
+  _default:
+    name: Default layout
+    template: fe_page
+    rows: 3rw
 
-    other_layout:
-      name: Other layout
-      template: fe_page_2
+  other_layout:
+    name: Other layout
+    template: fe_page_2
 
-  image_sizes:
-    # See https://docs.contao.org/dev/framework/image-processing/image-sizes/#size-configuration
+image_sizes:
+  # See https://docs.contao.org/dev/framework/image-processing/image-sizes/#size-configuration
 ```
+
+You can write the mainfest in YAML or XML format, as you prefer.
 
 ### 3. Install themes
 
-To install your new theme, run the migrate command: 
+To install your new theme, run the migrate command:
 
 ```bash
 ./vendor/bin/contao-console contao:migrate -n
@@ -97,7 +99,7 @@ body-class, etc. via the layout. Just put those changes directly into your fe_pa
 
 Instead of selecting CSS files and JS files via the layout (which is limited to files within /files),
 directly include your files via the {{asset}} insert tag or twig function (or via Encore, see below).
-Don't use the "custom <head>" or "custom <script>" settings in your layout. Its hard to maintain and
+Don't use the "custom `<head>`" or "custom `<script>`" settings in your layout. Its hard to maintain and
 keep track of. Put those things directly into the template.
 
 Considering these matters of maintainability, it's easier to not configure any settings in the layout.
@@ -160,7 +162,7 @@ Before running `contao:migrate`:
 
 3. All layout settings defined via the manifest file will be overridden in the
 `contao:migrate` command. Existing settings won't be touched.
- 
+
 ## Best Practices
 
 ### Do not rename the theme folder
@@ -170,7 +172,7 @@ You'll need to re-assign the layouts to the pages.
 
 ### Use twig templates
 
-You can Twig or PHP templates by your preference. As already mentioned,
+You can use Twig or PHP templates by your preference. As already mentioned,
 your templates belong to the `templates` folder.
 
 For Twig templates, suffix your file with `.html.twig`, i.e., `fe_page.html.twig`.
@@ -179,42 +181,23 @@ For PHP templates, use the default naming, i.e., `fe_page.html5`.
 For Twig templates, the bundle internally uses namespaced twig paths
 so that `fe_page.html.twig` templates from different themes do not conflict.
 
-#### Twig support under the hood
+Twig templates in the theme folder use the namespace `@Contao_Theme_<name>`, in a way that the
+template `/themes/foobar/templates/fe_page.html.twig` can be referenced as `@Contao_Theme_foobar/fe_page.html.twig`.
 
-Contao as of version 4.11 still does not have native Twig support, but native
-Twig support will come in a future Contao version. As for now, Twig support is
-tricky and provided by [m-vo/contao-twig](https://github.com/m-vo/contao-twig).
+You can place twig templates also in global (non theme-related) folders -- whatever feels right for you.
 
-Twig template can be placed into the directory `TL_ROOT/templates/`. Those 
-templates are loaded without namespace because of the `twig.default_path` setting.
-Those templates can be referenced by `{% include 'my_template.html.twig' %}`
-and will be automatically loaded in the front end.
+| File                                         | Twig namespace and reference              | Prio (first wins) |
+|:---------------------------------------------|:------------------------------------------|:------------------|
+| `/themes/foobar/templates/fe_page.html.twig` | `@Contao_Theme_foobar/fe_page.html.twig`  | 1                 |
+| `/templates/fe_page.html.twig`               | `@Contao_Global/fe_page.html.twig`        | 2                 |
+| `/contao/templates/fe_page.html.twig`        | `@Contao_App/fe_page.html.twig`           | 3                 |
 
-The templates inside `TL_ROOT/themes/my_theme/templates/` have a namespace prepended.
-The namespace is the name of the folder, i.e. 'my_theme', so that those templates
-can be referenced by using `{% include '@my_theme/my_template.html.twig' %}`
-
-Twig namespacing for frontend themes is necessary, because one can have multiple themes
-in Contao. Contao prioritizes the templates for the currently active theme in the frontend.
-However, one usually don’t need to use the namespace (because Contao automatically
-chooses the correct template) except if one directly references a template via `{% include %}`.
-
-Assume the following config:
-
-```yml
-theme:
-  layouts:
-    custom_layout:
-     name: My Layout
-     template: fe_page_custom
-```
-
-The `fe_page_custom.html.twig` file can be placed either in `TL_ROOT/templates` or `TL_ROOT/themes/my_theme/templates`.
+Read more about the usage of Twig templates in Contao under <https://docs.contao.org/dev/framework/templates/twig/>.
 
 ### Use Webpack Encore to compile your theme assets
 
 The skeleton theme comes with a pre-defined `webpack.config.js` file. The configuration
-will automatically process your asset files from the `assets` folder and generate the 
+will automatically process your asset files from the `assets` folder and generate the
 bundled files into the `public` folder.
 
 Webpack Encore will also provide an `entrypoints.json` in the public folder. This helps
