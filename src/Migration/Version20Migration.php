@@ -86,6 +86,9 @@ class Version20Migration implements MigrationInterface
             $this->filesystem->dumpFile($manifest->getRealPath(), Yaml::dump($yaml, 4));
         }
 
+        // Register template paths
+        $this->filesystemLoaderWarmer->refresh();
+
         return new MigrationResult(true, 'Upgrade was successful.');
     }
 }

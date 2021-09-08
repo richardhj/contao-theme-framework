@@ -19,12 +19,6 @@ services:
     tags:
       - { name: 'contao.hook', hook: getPageLayout }
 
-  Richardhj\ContaoThemeFramework\EventListener\RenderingForwarder:
-    arguments:
-      - '@twig'
-    tags:
-      - { name: 'contao.hook', hook: parseTemplate, priority: -132 }
-
   Richardhj\ContaoThemeFramework\Migration\Version20Migration:
     tags: [ { name: 'contao.migration', priority: 20 } ]
     arguments:
