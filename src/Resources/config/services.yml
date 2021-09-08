@@ -25,6 +25,13 @@ services:
     tags:
       - { name: 'contao.hook', hook: parseTemplate, priority: -132 }
 
+  Richardhj\ContaoThemeFramework\Migration\Version20Migration:
+    tags: [ { name: 'contao.migration', priority: 20 } ]
+    arguments:
+      - '@Contao\CoreBundle\Twig\Loader\ContaoFilesystemLoaderWarmer'
+      - '%kernel.project_dir%'
+      - '@filesystem'
+
   Richardhj\ContaoThemeFramework\Migration\ThemeMigration:
     tags: [ 'contao.migration' ]
     arguments:
