@@ -21,10 +21,10 @@ Create a folder for your theme under `/themes` with the following structure:
 |- files
 |- themes
  |- my_theme
-  |- assets          (Optional folder, we recommend placing your CSS/JS files there)
-  |- public          (Distribution folder with your CSS/JS files, will be symlinked into the web/ folder)
-  |- templates       (Overridden Contao templates, for frontend modules, etc.pp.)
-  |- theme.[yml|xml] (Theme manifest)
+  |- assets           (Optional folder, we recommend placing your CSS/JS files there)
+  |- public           (Distribution folder with your CSS/JS files, will be symlinked into the web/ folder)
+  |- templates        (Overridden Contao templates, for frontend modules, etc.pp.)
+  |- theme.[yml|yaml] (Theme manifest)
 ```
 
 If you do not use a preprocessor, you place all your CSS/JS files into the public folder.
@@ -65,7 +65,7 @@ image_sizes:
   # See https://docs.contao.org/dev/framework/image-processing/image-sizes/#size-configuration
 ```
 
-You can write the mainfest in YAML or XML format, as you prefer.
+In a next version, the XML format for theme manifests will be available.
 
 ### 3. Install themes
 

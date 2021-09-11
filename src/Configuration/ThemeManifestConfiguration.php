@@ -34,6 +34,8 @@ class ThemeManifestConfiguration implements ConfigurationInterface
                             ->scalarNode('name')->isRequired()->end()
                             ->scalarNode('template')->end()
                         ->end()
+                        // Keep arbitrary configuration
+                        ->ignoreExtraKeys(false)
                     ->end()
                     ->validate()
                         // Merge the default layout
