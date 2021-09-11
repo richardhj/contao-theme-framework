@@ -237,7 +237,7 @@ class ThemeMigration implements MigrationInterface
             $items = $imageSize['items'];
             unset($imageSize['items']);
 
-            $data = array_merge($imageSize, ['name' => $imageSizeName, 'pid' => $themeId, 'tstamp' => time()]);
+            $data = array_merge($imageSize, ['alias' => $imageSizeName, 'name' => $imageSizeName, 'pid' => $themeId, 'tstamp' => time()]);
 
             if (null === $imageSizeId) {
                 $this->connection->insert('tl_image_size', $data);

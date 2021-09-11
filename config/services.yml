@@ -9,6 +9,14 @@ services:
     tags:
       - { name: 'contao.callback', table: 'tl_layout', target: 'config.onload', priority: -1 }
 
+  Richardhj\ContaoThemeFramework\EventListener\ImageSizeDcaListener:
+    tags:
+      - { name: 'contao.callback', table: 'tl_image_size', target: 'config.onload', priority: -1 }
+
+  Richardhj\ContaoThemeFramework\EventListener\ImageSizeItemDcaListener:
+    tags:
+      - { name: 'contao.callback', table: 'tl_image_size_item', target: 'config.onload', priority: -1 }
+
   Richardhj\ContaoThemeFramework\EventListener\ThemeDcaListener:
     tags:
       - { name: 'contao.callback', table: 'tl_theme', target: 'config.onload', priority: -1 }
