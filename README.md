@@ -32,7 +32,7 @@ If you do not use a preprocessor, you place all your CSS/JS files into the publi
 Alternatively, copy the boilerplate folder:
 
 ```bash
-cp -r vendor/richardhj/contao-theme-framework/src/Resources/skeleton/theme themes/my_theme
+cp -r vendor/richardhj/contao-theme-framework/skeleton/theme themes/my_theme
 ```
 
 This command will install an opinionated starter theme pack.
@@ -74,6 +74,8 @@ To install your new theme, run the migrate command:
 ```bash
 ./vendor/bin/contao-console contao:migrate -n
 ```
+
+It is best to add the migrate command to your deployment script.
 
 To create the symlink for the public folder, run the following command (this only needs to be done once,
 and this is automatically done on `composer install`, so you usually should not be required to do this):
