@@ -63,22 +63,23 @@ class ThemeMigration implements MigrationInterface
             // Check fields exist
             $this->connection->executeQuery("SELECT id FROM tl_theme WHERE alias=''");
             $this->connection->executeQuery("SELECT id FROM tl_layout WHERE alias=''");
-
-            // Check for manifest changes
-            foreach ($manifests as $manifest) {
-                $manifestHash = md5_file($manifest->getRealPath());
-
-                $persistedHash = $this->connection
-                    ->executeQuery('SELECT manifestHash FROM tl_theme WHERE alias=:alias', [
-                        'alias' => $manifest->getRelativePath(),
-                    ])->fetchColumn();
-
-                if ($persistedHash !== $manifestHash) {
-                    return true;
-                }
-            }
+            $this->connection->executeQuery("SELECT id FROM tl_image_size WHERE alias=''");
         } catch (Exception $e) {
             return false;
+        }
+
+        // Check for manifest changes
+        foreach ($manifests as $manifest) {
+            $manifestHash = md5_file($manifest->getRealPath());
+
+            $persistedHash = $this->connection
+                ->executeQuery('SELECT manifestHash FROM tl_theme WHERE alias=:alias', [
+                    'alias' => $manifest->getRelativePath(),
+                ])->fetchColumn();
+
+            if ($persistedHash !== $manifestHash) {
+                return true;
+            }
         }
 
         return false;
@@ -230,7 +231,7 @@ class ThemeMigration implements MigrationInterface
     {
         foreach ($imageSizes as $imageSizeName => $imageSize) {
             $imageSizeId = $this->connection
-                   ->executeQuery('SELECT id FROM tl_image_size WHERE pid=:pid AND name=:alias', ['pid' => $themeId, 'alias' => $imageSizeName])
+                   ->executeQuery('SELECT id FROM tl_image_size WHERE pid=:pid AND alias=:alias', ['pid' => $themeId, 'alias' => $imageSizeName])
                    ->fetch(FetchMode::NUMERIC)[0] ?? null;
 
             $items = $imageSize['items'];
@@ -250,15 +251,12 @@ class ThemeMigration implements MigrationInterface
 
     private function persistImageSizeItems($imageSizeItems, $imageSizeId): void
     {
+        $this->connection->executeQuery('DELETE FROM tl_image_size_item WHERE pid=:pid', ['pid' => $imageSizeId]);
+
         foreach ($imageSizeItems as $imageSizeItem) {
             $data = array_merge($imageSizeItem, ['pid' => $imageSizeId, 'tstamp' => time()]);
 
-            $imageSizeItemId = null;
-            if (null === $imageSizeItemId) {
-                $this->connection->insert('tl_image_size_item', $data);
-            } else {
-                $this->connection->update('tl_image_size_item', $data, ['id' => $imageSizeItemId]);
-            }
+            $this->connection->insert('tl_image_size_item', $data);
         }
     }
 }
