@@ -75,7 +75,8 @@ To install your new theme, run the migrate command:
 ./vendor/bin/contao-console contao:migrate -n
 ```
 
-It is best to add the migrate command to your deployment script.
+> :information_source: When making changes on the theme manifest, the themes will only be updated on the migrate command.
+> It is best to add the migrate command to your deployment script (which is a good idea anyway).
 
 To create the symlink for the public folder, run the following command (this only needs to be done once,
 and this is automatically done on `composer install`, so you usually should not be required to do this):
@@ -180,19 +181,19 @@ your templates belong to the `templates` folder.
 For Twig templates, suffix your file with `.html.twig`, i.e., `fe_page.html.twig`.
 For PHP templates, use the default naming, i.e., `fe_page.html5`.
 
-For Twig templates, the bundle internally uses namespaced twig paths
-so that `fe_page.html.twig` templates from different themes do not conflict.
-
 Twig templates in the theme folder use the namespace `@Contao_Theme_<name>`, in a way that the
-template `/themes/foobar/templates/fe_page.html.twig` can be referenced as `@Contao_Theme_foobar/fe_page.html.twig`.
+template `/themes/my_theme/templates/fe_page.html.twig` can be referenced as `@Contao_Theme_MyTheme/fe_page.html.twig`.
+
+> :information_source: Note that the "theme slug" for the Twig namespace will be transformed to CamelCase. If your theme
+> folder is named `my_theme`, the Twig namespace will be `@Contao_Theme_MyTheme`.
 
 You can place twig templates also in global (non theme-related) folders -- whatever feels right for you.
 
-| File                                         | Twig namespace and reference              | Prio (first wins) |
-|:---------------------------------------------|:------------------------------------------|:------------------|
-| `/themes/foobar/templates/fe_page.html.twig` | `@Contao_Theme_foobar/fe_page.html.twig`  | 1                 |
-| `/templates/fe_page.html.twig`               | `@Contao_Global/fe_page.html.twig`        | 2                 |
-| `/contao/templates/fe_page.html.twig`        | `@Contao_App/fe_page.html.twig`           | 3                 |
+| File                                           | Twig namespace and reference               | Prio (first wins) |
+|:-----------------------------------------------|:-------------------------------------------|:------------------|
+| `/themes/my_theme/templates/fe_page.html.twig` | `@Contao_Theme_MyTheme/fe_page.html.twig`  | 1                 |
+| `/templates/fe_page.html.twig`                 | `@Contao_Global/fe_page.html.twig`         | 2                 |
+| `/contao/templates/fe_page.html.twig`          | `@Contao_App/fe_page.html.twig`            | 3                 |
 
 Read more about the usage of Twig templates in Contao under <https://docs.contao.org/dev/framework/templates/twig/>.
 
@@ -216,6 +217,8 @@ See https://github.com/richardhj/contao-knp-menu for more information.
 The distributed theme files inside the public folder usually are versioned and contain
 duplicated information so that you do not want to check in those files to version control.
 Instead, you want to build the theme (`yarn run prod`) before deploying.
+
+> :information_source: The [.gitignore file](skeleton/theme/.gitignore) of the skeleton theme may become handy.
 
 ### Do not deploy the assets folder
 
