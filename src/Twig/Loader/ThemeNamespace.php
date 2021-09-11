@@ -12,14 +12,16 @@ declare(strict_types=1);
 
 namespace Richardhj\ContaoThemeFramework\Twig\Loader;
 
+use Contao\CoreBundle\Twig\Loader\ThemeNamespace as BaseThemeNamespace;
+
 /**
  * Override the Twig namespace for our template directories.
  */
-class ThemeNamespace extends \Contao\CoreBundle\Twig\Loader\ThemeNamespace
+class ThemeNamespace extends BaseThemeNamespace
 {
-    private \Contao\CoreBundle\Twig\Loader\ThemeNamespace $decoratedLoader;
+    private BaseThemeNamespace $decoratedLoader;
 
-    public function __construct(\Contao\CoreBundle\Twig\Loader\ThemeNamespace $decoratedLoader)
+    public function __construct(BaseThemeNamespace $decoratedLoader)
     {
         $this->decoratedLoader = $decoratedLoader;
     }
@@ -27,8 +29,11 @@ class ThemeNamespace extends \Contao\CoreBundle\Twig\Loader\ThemeNamespace
     public function generateSlug(string $relativePath): string
     {
         // Normalize `themes/foo/templates` paths to `foo`.
-        $relativePath = preg_replace('/^\.\.\/themes\/(.+?)\/templates$/', '$1', $relativePath);
+        $slug = preg_replace('/^\.\.\/themes\/(.+?)\/templates$/', '$1', $relativePath);
 
-        return $this->decoratedLoader->generateSlug($relativePath);
+        // CamelCase slug
+        $slug = str_replace('_', '', ucwords($slug, '_'));
+
+        return $this->decoratedLoader->generateSlug($slug);
     }
 }
