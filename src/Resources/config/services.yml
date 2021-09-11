@@ -44,6 +44,10 @@ services:
       - '@Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection'
       - '@contao.themes.tag_renderer'
 
+  Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace:
+      decorates: 'Contao\CoreBundle\Twig\Loader\ThemeNamespace'
+      arguments: ['@Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace.inner']
+
   Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection:
     arguments:
       - '%kernel.project_dir%'
