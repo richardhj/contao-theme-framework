@@ -103,7 +103,7 @@ class ThemeMigration implements MigrationInterface
             $config = $this->processManifest($config);
             $manifestHash = md5_file($manifest->getRealPath());
 
-            $installed += (int) $this->persistTheme($themeName, $config, $manifestHash);
+            $installed += (int) $this->persistManifest($themeName, $config, $manifestHash);
         }
 
         $deleted = $this->connection->executeQuery(
@@ -117,7 +117,7 @@ class ThemeMigration implements MigrationInterface
         return new MigrationResult(true, sprintf('%d themes installed. %d themes deleted.', $installed, $deleted));
     }
 
-    private function persistTheme(string $themeName, array $config, string $manifestHash): bool
+    private function persistManifest(string $themeName, array $manifest, string $manifestHash): bool
     {
         $row = $this->connection
                 ->executeQuery('SELECT id, manifestHash FROM tl_theme WHERE alias=:alias', ['alias' => $themeName])
@@ -130,10 +130,56 @@ class ThemeMigration implements MigrationInterface
             return false;
         }
 
-        $themeId = $row['id'] ?? null;
+        // Table tl_theme
+        $themeId = $this->persistTheme($row['id'], $manifest['theme']['name'], $themeName, $manifestHash);
+
+        // Table tl_layout
+        $layouts = $manifest['layouts'] ?? [];
+        $this->persistLayouts($layouts, $themeId);
+        $this->cleanUpLayouts($themeId, $layouts);
+
+        // Table tl_image_size
+        $this->persistImageSizes($manifest['image_sizes'] ?? [], $themeId);
+
+        return true;
+    }
+
+    private function loadManifest($manifest)
+    {
+        $loaderResolver = new LoaderResolver([new YamlLoader()]);
+        $delegatingLoader = new DelegatingLoader($loaderResolver);
+
+        return $delegatingLoader->load($manifest->getRealPath());
+    }
+
+    private function processManifest(array $config): array
+    {
+        $config = (new Processor())->processConfiguration(new ThemeManifestConfiguration(), [$config]);
+
+        // Serialize arrays for the DB insert in tl_layout
+        foreach (array_keys($config['layouts']) as $layoutName) {
+            $config['layouts'][$layoutName] =
+                array_map(fn ($v) => \is_array($v) ? serialize($v) : $v, $config['layouts'][$layoutName]);
+        }
+
+        // Camel case keys for DB insert in tl_image_size
+        foreach ($config['image_sizes'] as $k => $imageSize) {
+            $config['image_sizes'][$k] = array_combine(array_map(function ($key) {
+                return lcfirst(str_replace('_', '', ucwords($key, '_')));
+            }, array_keys($imageSize)), array_values($imageSize));
+
+            $config['image_sizes'][$k]['formats'] = serialize($config['image_sizes'][$k]['formats']);
+        }
+
+        return $config;
+    }
+
+    private function persistTheme($id, $name, string $themeName, string $manifestHash): int
+    {
+        $themeId = $id ?? null;
 
         $data = [
-            'name' => $config['theme']['name'],
+            'name' => $name,
             'alias' => $themeName,
             'tstamp' => time(),
             'templates' => sprintf('themes/%s/templates', $themeName),
@@ -147,8 +193,11 @@ class ThemeMigration implements MigrationInterface
             $this->connection->update('tl_theme', $data, ['id' => $themeId]);
         }
 
-        $layouts = $config['layouts'] ?? [];
+        return (int) $themeId;
+    }
 
+    private function persistLayouts($layouts, int $themeId)
+    {
         foreach ($layouts as $layoutName => $layout) {
             $layoutId = $this->connection
                     ->executeQuery('SELECT id FROM tl_layout WHERE pid=:pid AND alias=:alias', ['pid' => $themeId, 'alias' => $layoutName])
@@ -166,34 +215,50 @@ class ThemeMigration implements MigrationInterface
                 $this->connection->update('tl_layout', $data, ['id' => $layoutId]);
             }
         }
+    }
 
+    private function cleanUpLayouts(int $themeId, $layouts): void
+    {
         $this->connection->executeQuery(
             'DELETE FROM tl_layout WHERE pid=:pid AND alias NOT IN (:aliases)',
             ['pid' => $themeId, 'aliases' => array_keys($layouts)],
             ['aliases' => Connection::PARAM_STR_ARRAY]
         );
-
-        return true;
     }
 
-    private function loadManifest($manifest)
+    private function persistImageSizes(array $imageSizes, int $themeId): void
     {
-        $loaderResolver = new LoaderResolver([new YamlLoader()]);
-        $delegatingLoader = new DelegatingLoader($loaderResolver);
+        foreach ($imageSizes as $imageSizeName => $imageSize) {
+            $imageSizeId = $this->connection
+                   ->executeQuery('SELECT id FROM tl_image_size WHERE pid=:pid AND name=:alias', ['pid' => $themeId, 'alias' => $imageSizeName])
+                   ->fetch(FetchMode::NUMERIC)[0] ?? null;
 
-        return $delegatingLoader->load($manifest->getRealPath());
-    }
+            $items = $imageSize['items'];
+            unset($imageSize['items']);
 
-    private function processManifest(array $config): array
-    {
-        $config = (new Processor())->processConfiguration(new ThemeManifestConfiguration(), [$config]);
+            $data = array_merge($imageSize, ['name' => $imageSizeName, 'pid' => $themeId, 'tstamp' => time()]);
 
-        // Serialize arrays for the DB insert.
-        foreach (array_keys($config['layouts']) as $layoutName) {
-            $config['layouts'][$layoutName] =
-                array_map(fn ($v) => \is_array($v) ? serialize($v) : $v, $config['layouts'][$layoutName]);
+            if (null === $imageSizeId) {
+                $this->connection->insert('tl_image_size', $data);
+            } else {
+                $this->connection->update('tl_image_size', $data, ['id' => $imageSizeId]);
+            }
+
+            $this->persistImageSizeItems($items, $imageSizeId);
         }
+    }
 
-        return $config;
+    private function persistImageSizeItems($imageSizeItems, $imageSizeId): void
+    {
+        foreach ($imageSizeItems as $imageSizeItem) {
+            $data = array_merge($imageSizeItem, ['pid' => $imageSizeId, 'tstamp' => time()]);
+
+            $imageSizeItemId = null;
+            if (null === $imageSizeItemId) {
+                $this->connection->insert('tl_image_size_item', $data);
+            } else {
+                $this->connection->update('tl_image_size_item', $data, ['id' => $imageSizeItemId]);
+            }
+        }
     }
 }
