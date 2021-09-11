@@ -1,7 +1,7 @@
 <h1 align="center">Contao Theme Framework</h1>
 
 <p align="center">A new standardized and database-less way to build frontend themes in Contao.</p>
- 
+
 <p align="center">A proposal for https://github.com/contao/contao/issues/2781.</p>
 
 <p align="center">
@@ -15,7 +15,13 @@
 - Registers a themes' public folder as Asset package, supports file versioning via a `manifest.json`!
 - Out-of-the-box support for Symfony Encore and its `entrypoints.json`!
 
-## Provide a theme
+## Installation
+
+```bash
+composer require richardhj/contao-theme-framework
+```
+
+## Quickstart
 
 ### 1. Create a theme folder
 
@@ -40,6 +46,8 @@ cp -r vendor/richardhj/contao-theme-framework/skeleton/theme themes/my_theme
 ```
 
 This command will install an opinionated starter theme pack.
+
+> :information_source: Except for the directory strucure that is predetermined, you are free in the technology you use (Encore, Webpack, Gulp, SASS, plain CSS, …).
 
 ### 2. Write the theme manifest
 
@@ -143,6 +151,8 @@ Example:
 {{ asset('images/logo.svg', 'my_theme') }}
 ```
 
+> :information_source: The simplest way to include a CSS file to the page is to modify the `fe_page.html5` template and include the `{{asset::css/custom.css::my_theme}}` insert tag. When you want to use Twig templates and Encore too, see :arrow_down:
+
 ### Encore
 
 When using Encore, you can use the following Twig functions to inject
@@ -152,6 +162,8 @@ your CSS and JS files to the page template (defined via the `entrypoints.json` f
 {{ theme_link_tags('app') }}
 {{ theme_script_tags('app') }}
 ```
+
+> :information_source: The name "app" matches the name of the entry defined in the [webpack.config.js](https://github.com/richardhj/contao-theme-framework/blob/528dfb7085b0d35036ed771cb0563a6b9f3a74ac/skeleton/theme/assets/webpack.config.js#L7). You can have multiple entrypoints per theme.
 
 You can find out more about Encore under https://symfony.com/doc/current/frontend.html.
 
@@ -244,7 +256,7 @@ This will allow you to run the build command once when having multiple themes in
   "workspaces": ["themes/*/assets"],
   "scripts": {
     "prod": "yarn workspaces run prod",
-  },
+  }
 }
 ```
 
