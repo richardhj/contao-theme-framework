@@ -1,8 +1,12 @@
-# Contao Theme Framework
+<h1 align="center">Contao Theme Framework</h1>
 
-A new standardized and database-less way to build frontend themes in Contao.
+<p align="center">A new standardized and database-less way to build frontend themes in Contao.</p>
+ 
+<p align="center">A proposal for https://github.com/contao/contao/issues/2781.</p>
 
-Proposal for https://github.com/contao/contao/issues/2781
+<p align="center">
+<img src="https://user-images.githubusercontent.com/1284725/132962831-dcef78a7-2604-4782-aaf5-928321683059.png" alt="" width="550">
+</p>
 
 ## Features
 
