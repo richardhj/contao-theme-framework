@@ -10,4 +10,6 @@ declare(strict_types=1);
  * @license MIT
  */
 
+$GLOBALS['TL_DCA']['tl_theme']['config']['sql']['keys']['alias'] = 'unique';
+
 $GLOBALS['TL_DCA']['tl_layout']['fields']['alias']['sql'] = 'varchar(128) default NULL';
