@@ -17,6 +17,7 @@ use Symfony\WebpackEncoreBundle\Asset\EntrypointLookup;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupCollectionInterface;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
 use Symfony\WebpackEncoreBundle\Exception\UndefinedBuildException;
+use Webmozart\PathUtil\Path;
 
 /**
  * Aggregate the different Encore entry points that are configured via theme.yml manifests.
@@ -27,11 +28,11 @@ use Symfony\WebpackEncoreBundle\Exception\UndefinedBuildException;
  */
 class EncoreEntrypointLookupCollection implements EntrypointLookupCollectionInterface
 {
-    private string $projectDir;
+    private string $webDir;
 
-    public function __construct(string $projectDir)
+    public function __construct(string $webDir)
     {
-        $this->projectDir = $projectDir;
+        $this->webDir = $webDir;
     }
 
     /**
@@ -48,7 +49,7 @@ class EncoreEntrypointLookupCollection implements EntrypointLookupCollectionInte
             $buildName = $pageModel->theme;
         }
 
-        $themePath = sprintf('%s/web/themes/%s/entrypoints.json', $this->projectDir, $buildName);
+        $themePath = Path::join($this->webDir, 'themes', $buildName, 'entrypoints.json');
 
         return new EntrypointLookup($themePath);
     }

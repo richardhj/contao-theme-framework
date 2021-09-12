@@ -4,6 +4,7 @@ services:
       - { name: kernel.event_listener, event: 'contao.generate_symlinks' }
     arguments:
       - '%kernel.project_dir%'
+      - '%contao.web_dir%'
 
   Richardhj\ContaoThemeFramework\EventListener\LayoutDcaListener:
     tags:
@@ -58,7 +59,7 @@ services:
 
   Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection:
     arguments:
-      - '%kernel.project_dir%'
+      - '%contao.web_dir%'
 
   contao.themes.tag_renderer:
     class: Symfony\WebpackEncoreBundle\Asset\TagRenderer

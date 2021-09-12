@@ -22,10 +22,12 @@ use Webmozart\PathUtil\Path;
 class SymlinkListener
 {
     private string $rootDir;
+    private string $webDir;
 
-    public function __construct(string $rootDir)
+    public function __construct(string $rootDir, string $webDir)
     {
         $this->rootDir = $rootDir;
+        $this->webDir = $webDir;
     }
 
     public function __invoke(GenerateSymlinksEvent $event)
@@ -40,7 +42,7 @@ class SymlinkListener
         foreach ($finder as $theme) {
             $event->addSymlink(
                 Path::join('themes', $theme->getRelativePathname()),
-                Path::join('web', 'themes', $theme->getRelativePath())
+                Path::join(basename($this->webDir), 'themes', $theme->getRelativePath())
             );
         }
     }
