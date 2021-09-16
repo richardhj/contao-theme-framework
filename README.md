@@ -47,7 +47,7 @@ cp -r vendor/richardhj/contao-theme-framework/skeleton/theme themes/my_theme
 
 This command will install an opinionated starter theme pack.
 
-> :information_source: Except for the directory strucure that is predetermined, you are free in the technology you use (Encore, Webpack, Gulp, SASS, plain CSS, …).
+> :information_source: Except for the directory structure that is predetermined, you are free in the technology you use (Encore, Webpack, Gulp, SASS, plain CSS, …).
 
 ### 2. Write the theme manifest
 
@@ -87,7 +87,7 @@ To install your new theme, run the migrate command:
 ./vendor/bin/contao-console contao:migrate -n
 ```
 
-> :information_source: When making changes on the theme manifest, the themes will only be updated on the migrate command.
+> :information_source: The themes will only be updated on the migrate command when making changes on the theme manifest.
 > It is best to add the migrate command to your deployment script (which is a good idea anyway).
 
 To create the symlink for the public folder, run the following command (this only needs to be done once,
@@ -110,17 +110,17 @@ Usage
 Good question!
 
 The layouts in Contao are highly redundant. You don't need to configure a viewport-attribute,
-body-class, etc. via the layout. Just put those changes directly into your fe_page template.
+body-class, etc. via the layout. Instead, just put those changes directly into your fe_page template.
 
 Instead of selecting CSS files and JS files via the layout (which is limited to files within /files),
 directly include your files via the {{asset}} insert tag or twig function (or via Encore, see below).
-Don't use the "custom `<head>`" or "custom `<script>`" settings in your layout. Its hard to maintain and
-keep track of. Put those things directly into the template.
+Don't use the "custom `<head>`" or "custom `<script>`" settings in your layout. It's hard to maintain and
+keep track of. Instead, put those things directly into the template.
 
-Considering these matters of maintainability, it's easier to not configure any settings in the layout.
+Considering these matters of maintainability, it's easier not to configure any settings in the layout.
 Assigning the modules to the layout sections is all you do in the layouts.
 
-If your layouts uses rows and cols, set the corresponding config in the `theme.yml`. For instance,
+If your layouts use rows and cols, set the corresponding config in the `theme.yml`. For instance,
 `rows: 3rw` enables the header and footer section.
 
 _Using Twig templates (optional):_
@@ -128,7 +128,7 @@ _Using Twig templates (optional):_
 In case your header and footer sections only contain static content, you do not have to configure
 those sections in your layout. Just include those sections via Twig includes. For navigation menus,
 you can use a Knp Menu (see below). For a user menu, you can use the [{{ app.user }} variable](https://symfony.com/doc/current/templates.html#the-app-global-variable).
-You will be surprised, how not using modules for the layout significantly enhances maintainability.
+You will be surprised how not using modules for the layout significantly enhances maintainability.
 
 ### Assets
 
@@ -243,7 +243,7 @@ because it most likely contains the node_modules folder next to the source folde
 In contrast, all other files, like the theme.yml manifest and public and templates folders
 need to be uploaded when deploying.
 
-### Use yarn webspaces to manage multiple themes
+### Use yarn workspaces to manage multiple themes
 
 You can make use of [yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/).
 This will allow you to run the build command once when having multiple themes in use:
@@ -261,6 +261,16 @@ This will allow you to run the build command once when having multiple themes in
 ```
 
 You then will be able to run `yarn run prod` from the root directory.
+
+### Uninstalling
+
+You wonder what happens to your themes when you uninstall the extension?
+
+First, all your themes, layouts, and image size configurations stay in Contao. They won't get removed.
+
+Second, templates under /themes/foobar/templates won't use the namespace `@Contao_Theme_MyTheme` anymore but the namespace `@Contao_Theme__themes_foobar_templates`. This may break your website. For this to fix, move the templates folder to the `/templates` directory in the project root.
+
+Third, you lose the Encore and assets integration. This means that using the asset function or insert tag will fail. Further, the twig functions `theme_link_tags()` and `theme_script_tags()` will become unavailable. For this to fix, you might include your CSS/JS files differently.
 
 ### Use Symfony UX
 
