@@ -167,6 +167,53 @@ your CSS and JS files to the page template (defined via the `entrypoints.json` f
 
 You can find out more about Encore under https://symfony.com/doc/current/frontend.html.
 
+### Custom layout sections
+
+[Custom layout areas](https://docs.contao.org/manual/en/layout/theme-manager/manage-page-layouts/#custom-layout-areas) in the layout work as follows.
+
+First, define the sections in the layout:
+
+```yaml
+# themes/my_theme/theme.yml
+layouts:
+  _default:
+    name: Default layout
+    sections:
+      - title: Bereich A
+        id: custom1
+        postion: manual
+        template: block_section
+      - title: Bereich B
+        id: custom2
+        postion: manual
+        template: block_section
+```
+
+Then, add the section(s) to the page layout (i.e., `fe_page`):
+
+```twig
+{# themes/my_theme/fe_page.html.twig #}
+
+<div>
+  {{ section.invoke('custom1') }}
+</div>
+<div>
+  {{ section.invoke('custom2') }}
+</div>
+````
+
+
+```php
+<!-- themes/my_theme/fe_page.html5 -->
+
+<div>
+  <?php $this->section('custom1') ?>
+</div>
+<div>
+  <?php $this->section('custom2') ?>
+</div>
+````
+
 ### Migrate to theme-framework
 
 You can migrate your existing theme and layouts to the theme-framework.
@@ -268,9 +315,9 @@ You wonder what happens to your themes when you uninstall the extension?
 
 First, all your themes, layouts, and image size configurations stay in Contao. They won't get removed.
 
-Second, templates under /themes/foobar/templates won't use the namespace `@Contao_Theme_MyTheme` anymore but the namespace `@Contao_Theme__themes_foobar_templates`. This may break your website. For this to fix, move the templates folder to the `/templates` directory in the project root.
+Second, templates under `/themes/foobar/templates` won't use the namespace `@Contao_Theme_Foobar` anymore but the namespace `@Contao_Theme__themes_foobar_templates`. This may break your website. For this to fix, move the templates folder to `/templates/Foobar` (from the project root). The Twig namespace stays intact.
 
-Third, you lose the Encore and assets integration. This means that using the asset function or insert tag will fail. Further, the twig functions `theme_link_tags()` and `theme_script_tags()` will become unavailable. For this to fix, you might include your CSS/JS files differently.
+Third, you lose the Encore and assets integration. This means that using the asset (`{{ asset() }}`) function or insert tag (`{{asset::*}}`) will fail. Further, the twig functions `theme_link_tags()` and `theme_script_tags()` will become unavailable. For this to fix, you have to include your CSS/JS files by directly referencing to them.
 
 ### Use Symfony UX
 
