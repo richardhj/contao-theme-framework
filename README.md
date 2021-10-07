@@ -10,7 +10,7 @@
 
 ## Features
 
-- Automatically registers themes and layouts defined via a `theme.yml` manifest file: Almost no database do maintain - easier deployment!
+- Automatically registers themes and layouts defined via a `theme.yml` manifest file: Almost no database to maintain - easier deployment!
 - Disables all redundant fields from the tl_theme and tl_layout palettes - you define all settings via the manifest file (except for the module includes).
 - Registers a themes' public folder as Asset package, supports file versioning via a `manifest.json`!
 - Out-of-the-box support for Symfony Encore and its `entrypoints.json`!
@@ -181,11 +181,11 @@ layouts:
     sections:
       - title: Bereich A
         id: custom1
-        postion: manual
+        position: manual
         template: block_section
       - title: Bereich B
         id: custom2
-        postion: manual
+        position: manual
         template: block_section
 ```
 
