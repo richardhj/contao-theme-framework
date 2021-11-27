@@ -17,7 +17,6 @@ use Contao\CoreBundle\Migration\MigrationResult;
 use Contao\CoreBundle\Twig\Loader\ContaoFilesystemLoaderWarmer;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
-use Doctrine\DBAL\FetchMode;
 use Richardhj\ContaoThemeFramework\Configuration\ThemeManifestConfiguration;
 use Richardhj\ContaoThemeFramework\Configuration\YamlLoader;
 use Symfony\Component\Config\Definition\Processor;
@@ -75,7 +74,7 @@ class ThemeMigration implements MigrationInterface
             $persistedHash = $this->connection
                 ->executeQuery('SELECT manifestHash FROM tl_theme WHERE alias=:alias', [
                     'alias' => $manifest->getRelativePath(),
-                ])->fetchColumn();
+                ])->fetchOne();
 
             if ($persistedHash !== $manifestHash) {
                 return true;
@@ -122,7 +121,7 @@ class ThemeMigration implements MigrationInterface
     {
         $row = $this->connection
                 ->executeQuery('SELECT id, manifestHash FROM tl_theme WHERE alias=:alias', ['alias' => $themeName])
-                ->fetch(FetchMode::ASSOCIATIVE);
+                ->fetchAssociative();
 
         // Prevent array-access error when theme not found
         $row = false === $row ? [] : $row;
@@ -202,12 +201,12 @@ class ThemeMigration implements MigrationInterface
         foreach ($layouts as $layoutName => $layout) {
             $layoutId = $this->connection
                     ->executeQuery('SELECT id FROM tl_layout WHERE pid=:pid AND alias=:alias', ['pid' => $themeId, 'alias' => $layoutName])
-                    ->fetch(FetchMode::NUMERIC)[0] ?? null;
+                    ->fetchOne();
 
             $data = array_merge(['framework' => ''], $layout);
             $data = array_merge($data, ['alias' => $layoutName, 'pid' => $themeId, 'tstamp' => time()]);
 
-            if (null === $layoutId) {
+            if (false === $layoutId) {
                 // For new layouts, enable the article module in the main column
                 $data = array_merge(['modules' => serialize([['mod' => '0', 'col' => 'main', 'enable' => '1']])], $data);
 
@@ -232,15 +231,16 @@ class ThemeMigration implements MigrationInterface
         foreach ($imageSizes as $imageSizeName => $imageSize) {
             $imageSizeId = $this->connection
                    ->executeQuery('SELECT id FROM tl_image_size WHERE pid=:pid AND alias=:alias', ['pid' => $themeId, 'alias' => $imageSizeName])
-                   ->fetch(FetchMode::NUMERIC)[0] ?? null;
+                   ->fetchOne();
 
             $items = $imageSize['items'];
             unset($imageSize['items']);
 
             $data = array_merge($imageSize, ['alias' => $imageSizeName, 'name' => $imageSizeName, 'pid' => $themeId, 'tstamp' => time()]);
 
-            if (null === $imageSizeId) {
+            if (false === $imageSizeId) {
                 $this->connection->insert('tl_image_size', $data);
+                $imageSizeId = $this->connection->lastInsertId();
             } else {
                 $this->connection->update('tl_image_size', $data, ['id' => $imageSizeId]);
             }
