@@ -54,7 +54,7 @@ class ThemeMigration implements MigrationInterface
         $manifests = (new Finder())
             ->files()
             ->in($this->rootDir.'/themes')
-            ->name(['theme.yml', 'theme.yaml', 'theme.xml'])
+            ->name(['theme.yml', 'theme.yaml'])
             ->getIterator()
         ;
 
