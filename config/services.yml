@@ -54,7 +54,7 @@ services:
       - '@contao.themes.tag_renderer'
 
   Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace:
-      decorates: 'Contao\CoreBundle\Twig\Loader\ThemeNamespace'
+      decorates: 'contao.twig.loader.theme_namespace'
       arguments: ['@Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace.inner']
 
   Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection:
