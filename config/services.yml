@@ -48,14 +48,20 @@ services:
       - '%kernel.project_dir%'
 
   Richardhj\ContaoThemeFramework\Twig\EncoreEntryFilesTwigExtension:
-    tags: ['twig.extension']
+    tags: [ 'twig.extension' ]
     arguments:
       - '@Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection'
       - '@contao.themes.tag_renderer'
 
   Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace:
-      decorates: 'Contao\CoreBundle\Twig\Loader\ThemeNamespace'
-      arguments: ['@Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace.inner']
+    decorates: 'contao.twig.loader.theme_namespace'
+    arguments: [ '@Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace.inner' ]
+
+  # Only needed for Contao 4.12 compatibility
+  richardhj.contao_theme_frameowrk.twig_namespace_loader_legacy:
+    class: Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace
+    decorates: 'Contao\CoreBundle\Twig\Loader\ThemeNamespace'
+    arguments: [ '@Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace.inner' ]
 
   Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection:
     arguments:
