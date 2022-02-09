@@ -44,9 +44,9 @@ class EncoreEntrypointLookupCollection implements EntrypointLookupCollectionInte
     {
         if (null === $buildName || '_default' === $buildName) {
             /** @var PageModel $pageModel */
-            $pageModel = $GLOBALS['objPage'];
-
-            $buildName = $pageModel->theme;
+            if (null !== $pageModel = $GLOBALS['objPage'] ?? null) {
+                $buildName = $pageModel->theme;
+            }
         }
 
         $themePath = Path::join($this->webDir, 'themes', $buildName, 'entrypoints.json');
