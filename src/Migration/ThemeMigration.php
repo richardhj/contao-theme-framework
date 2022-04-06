@@ -131,7 +131,7 @@ class ThemeMigration implements MigrationInterface
         }
 
         // Table tl_theme
-        $themeId = $this->persistTheme($row['id'], $manifest['theme']['name'], $themeName, $manifestHash);
+        $themeId = $this->persistTheme($row['id'] ?? null, $manifest['theme']['name'], $themeName, $manifestHash);
 
         // Table tl_layout
         $layouts = $manifest['layouts'] ?? [];
