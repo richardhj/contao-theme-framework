@@ -2,8 +2,6 @@
 
 <p align="center">A new standardized and database-less way to build frontend themes in Contao.</p>
 
-<p align="center">A proposal for https://github.com/contao/contao/issues/2781.</p>
-
 <p align="center">
 <img src="https://user-images.githubusercontent.com/1284725/132962831-dcef78a7-2604-4782-aaf5-928321683059.png" alt="" width="550">
 </p>
@@ -14,6 +12,8 @@
 - Disables all redundant fields from the tl_theme and tl_layout palettes - you define all settings via the manifest file (except for the module includes).
 - Registers a themes' public folder as Asset package, supports file versioning via a `manifest.json`!
 - Out-of-the-box support for Symfony Encore and its `entrypoints.json`!
+
+This extension is stable and supported from Contao >=4.13 and will be integrated into the Contao Core at some time, see https://github.com/contao/contao/issues/2781.
 
 ## Installation
 
@@ -132,14 +132,14 @@ You will be surprised how not using modules for the layout significantly enhance
 
 ### Assets
 
-Each theme's public folder is registered as `assets.packages` component.
-[Learn more about the Asset component.](https://symfony.com/doc/current/components/asset.html)
+Each theme's public folder (i.e., `/themes/my_theme/public`) is registered as `assets.packages`
+component. [Learn more about the Asset component.](https://symfony.com/doc/current/components/asset.html)
 
 You can reference any file inside the theme's public folder with the `{{asset}}` insert tag
-or corresponding twig function. The theme name corresponds to the package name.
+or corresponding twig function. The theme name equals the folder name.
 
-A `manifest.json` inside the public folder will be respected.
-Make sure to use `setManifestKeyPrefix('')` in your `webpack.config.js` file then.
+When you use a `manifest.json` inside the public folder, it will be handled by Symfony's Asset
+component. Make sure to use `setManifestKeyPrefix('')` in your `webpack.config.js` file then.
 
 Example:
 
