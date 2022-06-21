@@ -13,7 +13,7 @@
 - Registers a themes' public folder as Asset package, supports file versioning via a `manifest.json`!
 - Out-of-the-box support for Symfony Encore and its `entrypoints.json`!
 
-This extension is stable and supported from Contao >=4.13 and will be integrated into the Contao Core at some time, see https://github.com/contao/contao/issues/2781.
+This extension is stable and supported from Contao >=4.13 and will be integrated into the Contao Core at some time eventually, see https://github.com/contao/contao/issues/2781.
 
 ## Installation
 
