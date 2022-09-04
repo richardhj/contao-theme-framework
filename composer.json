@@ -14,9 +14,9 @@
     "source": "https://github.com/richardhj/contao-theme-framework"
   },
   "require": {
-    "php": ">=7.4",
-    "contao/core-bundle": "^4.13",
-    "symfony/config": "^4.4 || ^5.0",
+    "php": ">=8.1",
+    "contao/core-bundle": "^5.0",
+    "symfony/config": "^5.0 || ^6.0",
     "webmozart/path-util": "^2.3",
     "symfony/webpack-encore-bundle": "^1.11"
   },
@@ -33,5 +33,11 @@
   },
   "extra": {
     "contao-manager-plugin": "Richardhj\\ContaoThemeFramework\\ContaoManager\\Plugin"
+  },
+  "config": {
+    "allow-plugins": {
+      "contao-components/installer": true,
+      "contao/manager-plugin": true
+    }
   }
 }
