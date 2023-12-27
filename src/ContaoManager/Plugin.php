@@ -22,7 +22,7 @@ use Richardhj\ContaoThemeFramework\RichardhjContaoThemeFrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class Plugin implements BundlePluginInterface, ConfigPluginInterface
+class Plugin implements BundlePluginInterface
 {
     public function getBundles(ParserInterface $parser): array
     {
@@ -30,12 +30,5 @@ class Plugin implements BundlePluginInterface, ConfigPluginInterface
             BundleConfig::create(RichardhjContaoThemeFrameworkBundle::class)
                 ->setLoadAfter([ContaoCoreBundle::class]),
         ];
-    }
-
-    public function registerContainerConfiguration(LoaderInterface $loader, array $managerConfig): void
-    {
-        $loader->load(static function (ContainerBuilder $container): void {
-            $container->addCompilerPass(new AddAssetsPackagesPass());
-        });
     }
 }

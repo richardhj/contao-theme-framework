@@ -42,7 +42,7 @@ If you do not use a preprocessor, you place all your CSS/JS files into the publi
 Alternatively, copy the boilerplate folder:
 
 ```bash
-cp -r vendor/richardhj/contao-theme-framework/skeleton/theme themes/my_theme
+cp -r vendor/richardhj/contao-theme-framework/skeleton/theme themes/[my_theme]
 ```
 
 This command will install an opinionated starter theme pack.
@@ -54,7 +54,7 @@ This command will install an opinionated starter theme pack.
 Write your theme manifest:
 
 ```yml
-# themes/my_theme/theme.yml
+# themes/[my_theme]/theme.yml
 
 theme:
   name: My cool theme
@@ -105,6 +105,62 @@ and assign them to the layouts accordingly.
 Usage
 -----
 
+The following chapters describe how you write frontend code, depending on your preferred toolchain:
+
+### Vanilla (No toolchain)
+
+Each theme's public folder (i.e., `/themes/[my_theme]/public`) is registered as `assets.packages`
+component. [Learn more about the Asset component.](https://symfony.com/doc/current/components/asset.html)
+
+You can reference any file inside the theme's public folder with the `{{asset}}` insert tag
+or corresponding twig function. The theme name equals the folder name.
+
+When you use a `manifest.json` inside the public folder, it will be handled by Symfony's Asset
+component. Make sure to use `setManifestKeyPrefix('')` in your `webpack.config.js` file then.
+
+**Example:**
+
+```html
+<!-- HTML5 -->
+{{asset::images/logo.svg::my_theme}}
+
+<!-- Twig -->
+{{ asset('images/logo.svg', 'my_theme') }}
+```
+
+> :information_source: The simplest way to include a CSS file to the page is to modify the `fe_page.html5` template and include the `{{asset::css/custom.css::my_theme}}` insert tag.
+
+### Encore
+
+Read the documentation for Encore here: https://symfony.com/doc/current/frontend/encore/index.html
+
+First, install Webpack Encore:
+
+```shell
+composer require symfony/webpack-encore-bundle
+```
+
+Make sure to configure Encore properly by placing the [webpack.config.js](skeleton/theme/webpack.config.js) file inside
+your `themes/[my_theme]/assets` folder.
+
+Then you will be able to inject your CSS and JS files to the page template:
+
+```twig
+{{ theme_link_tags('app') }}
+{{ theme_script_tags('app') }}
+```
+
+> :information_source: The name "app" matches the name of the entry defined in the [webpack.config.js](https://github.com/richardhj/contao-theme-framework/blob/528dfb7085b0d35036ed771cb0563a6b9f3a74ac/skeleton/theme/assets/webpack.config.js#L7). You can have multiple entrypoints per theme.
+
+### Asset Mapper
+
+Read the documentation for the Asset Mapper here: https://symfony.com/doc/current/frontend/asset_mapper.html
+
+(tba)
+
+FAQ
+---
+
 ### Wait – How do I build a website if all fields are disabled from tl_layout?
 
 Good question!
@@ -130,43 +186,6 @@ those sections in your layout. Just include those sections via Twig includes. Fo
 you can use a Knp Menu (see below). For a user menu, you can use the [{{ app.user }} variable](https://symfony.com/doc/current/templates.html#the-app-global-variable).
 You will be surprised how not using modules for the layout significantly enhances maintainability.
 
-### Assets
-
-Each theme's public folder (i.e., `/themes/my_theme/public`) is registered as `assets.packages`
-component. [Learn more about the Asset component.](https://symfony.com/doc/current/components/asset.html)
-
-You can reference any file inside the theme's public folder with the `{{asset}}` insert tag
-or corresponding twig function. The theme name equals the folder name.
-
-When you use a `manifest.json` inside the public folder, it will be handled by Symfony's Asset
-component. Make sure to use `setManifestKeyPrefix('')` in your `webpack.config.js` file then.
-
-Example:
-
-```html
-<!-- HTML5 -->
-{{asset::images/logo.svg::my_theme}}
-
-<!-- Twig -->
-{{ asset('images/logo.svg', 'my_theme') }}
-```
-
-> :information_source: The simplest way to include a CSS file to the page is to modify the `fe_page.html5` template and include the `{{asset::css/custom.css::my_theme}}` insert tag. When you want to use Twig templates and Encore too, see :arrow_down:
-
-### Encore
-
-When using Encore, you can use the following Twig functions to inject
-your CSS and JS files to the page template (defined via the `entrypoints.json` file):
-
-```twig
-{{ theme_link_tags('app') }}
-{{ theme_script_tags('app') }}
-```
-
-> :information_source: The name "app" matches the name of the entry defined in the [webpack.config.js](https://github.com/richardhj/contao-theme-framework/blob/528dfb7085b0d35036ed771cb0563a6b9f3a74ac/skeleton/theme/assets/webpack.config.js#L7). You can have multiple entrypoints per theme.
-
-You can find out more about Encore under https://symfony.com/doc/current/frontend.html.
-
 ### Custom layout sections
 
 [Custom layout areas](https://docs.contao.org/manual/en/layout/theme-manager/manage-page-layouts/#custom-layout-areas) in the layout work as follows.
@@ -174,7 +193,7 @@ You can find out more about Encore under https://symfony.com/doc/current/fronten
 First, define the sections in the layout:
 
 ```yaml
-# themes/my_theme/theme.yml
+# themes/[my_theme]/theme.yml
 layouts:
   _default:
     name: Default layout
