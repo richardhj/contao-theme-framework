@@ -40,12 +40,6 @@ services:
       - '@filesystem'
       - '%kernel.project_dir%'
 
-  Richardhj\ContaoThemeFramework\Twig\EncoreEntryFilesTwigExtension:
-    tags: [ 'twig.extension' ]
-    arguments:
-      - '@Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection'
-      - '@contao.themes.tag_renderer'
-
   Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace:
     decorates: 'contao.twig.loader.theme_namespace'
     arguments: [ '@Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace.inner' ]

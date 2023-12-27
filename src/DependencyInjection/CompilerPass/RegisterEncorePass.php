@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Richardhj\ContaoThemeFramework\DependencyInjection\CompilerPass;
 
+use Richardhj\ContaoThemeFramework\Twig\EncoreEntryFilesTwigExtension;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -43,5 +44,14 @@ class RegisterEncorePass implements CompilerPassInterface
         $definition->addTag('kernel.reset', ['method'=>'reset']);
 
         $container->setDefinition('contao.themes.tag_renderer', $definition);
+
+        $definition = new Definition(EncoreEntryFilesTwigExtension::class, [
+            '@Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection',
+            '@contao.themes.tag_renderer',
+        ]);
+
+        $definition->addTag('twig.extension');
+
+        $container->setDefinition(EncoreEntryFilesTwigExtension::class, $definition);
     }
 }
