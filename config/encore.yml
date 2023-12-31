@@ -1,0 +1,18 @@
+services:
+  Richardhj\ContaoThemeFramework\Twig\EncoreEntryFilesTwigExtension:
+    tags: [ 'twig.extension' ]
+    arguments:
+      - '@Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection'
+      - '@contao.themes.tag_renderer'
+
+  contao.themes.tag_renderer:
+    class: Symfony\WebpackEncoreBundle\Asset\TagRenderer
+    arguments:
+      - '@Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection'
+      - '@assets.packages'
+      - [ ]
+      - [ ]
+      - [ ]
+      - '@event_dispatcher'
+    tags:
+      - { name: 'kernel.reset', method: 'reset' }

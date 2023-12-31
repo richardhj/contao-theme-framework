@@ -152,6 +152,35 @@ Then you will be able to inject your CSS and JS files to the page template:
 
 > :information_source: The name "app" matches the name of the entry defined in the [webpack.config.js](https://github.com/richardhj/contao-theme-framework/blob/528dfb7085b0d35036ed771cb0563a6b9f3a74ac/skeleton/theme/assets/webpack.config.js#L7). You can have multiple entrypoints per theme.
 
+Finally, some tips for working with Encore and bundlers:
+
+#### Git-Ignore the public folder
+
+The distributed theme files inside the public folder usually are versioned and contain
+duplicated information so that you do not want to check in those files to version control.
+Instead, you want to build the theme (`yarn run prod`) before deploying.
+
+> :information_source: The [.gitignore file](skeleton/theme/.gitignore) of the skeleton theme may become handy.
+
+#### Use yarn workspaces to manage multiple themes
+
+You can make use of [yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/).
+This will allow you to run the build command once when having multiple themes in use:
+
+```json
+// /package.json
+
+{
+  "private": true,
+  "workspaces": ["themes/*/assets"],
+  "scripts": {
+    "prod": "yarn workspaces run prod"
+  }
+}
+```
+
+You then will be able to run `yarn run prod` from the root directory.
+
 ### Asset Mapper
 
 Read the documentation for the Asset Mapper here: https://symfony.com/doc/current/frontend/asset_mapper.html
@@ -294,39 +323,12 @@ With a KnpMenu you are much more flexible in outputting a navigation wherever yo
 
 See https://github.com/richardhj/contao-knp-menu for more information.
 
-### Git-Ignore the public folder
-
-The distributed theme files inside the public folder usually are versioned and contain
-duplicated information so that you do not want to check in those files to version control.
-Instead, you want to build the theme (`yarn run prod`) before deploying.
-
-> :information_source: The [.gitignore file](skeleton/theme/.gitignore) of the skeleton theme may become handy.
-
 ### Do not deploy the assets folder
 
 The assets folder with the source files (if present) should be excluded from the deployment
 because it most likely contains the node_modules folder next to the source folder.
 In contrast, all other files, like the theme.yml manifest and public and templates folders
 need to be uploaded when deploying.
-
-### Use yarn workspaces to manage multiple themes
-
-You can make use of [yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/).
-This will allow you to run the build command once when having multiple themes in use:
-
-```json
-// /package.json
-
-{
-  "private": true,
-  "workspaces": ["themes/*/assets"],
-  "scripts": {
-    "prod": "yarn workspaces run prod",
-  }
-}
-```
-
-You then will be able to run `yarn run prod` from the root directory.
 
 ### Uninstalling
 

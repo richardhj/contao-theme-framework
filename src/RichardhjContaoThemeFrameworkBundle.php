@@ -27,6 +27,5 @@ class RichardhjContaoThemeFrameworkBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $container->addCompilerPass(new AddAssetsPackagesPass());
-        $container->addCompilerPass(new RegisterEncorePass());
     }
 }
