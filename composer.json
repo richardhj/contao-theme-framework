@@ -15,7 +15,7 @@
   },
   "require": {
     "php": ">=8.1",
-    "contao/core-bundle": "^5.0",
+    "contao/core-bundle": "^5.3",
     "symfony/config": "^5.0 || ^6.0 || ^7.0",
     "webmozart/path-util": "^2.3"
   },
