@@ -32,7 +32,7 @@ services:
     tags: [ 'contao.migration' ]
     arguments:
       - '@database_connection'
-      - '@contao.twig.filesystem_loader_warmer'
+      - '@contao.twig.filesystem_loader'
       - '%kernel.project_dir%'
 
   Richardhj\ContaoThemeFramework\Command\CreateThemeCommand:
