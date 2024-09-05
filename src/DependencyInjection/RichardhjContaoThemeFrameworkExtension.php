@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Richardhj\ContaoThemeFramework\DependencyInjection;
 
-use Ferienpass\CmsBundle\DependencyInjection\Configuration;
 use Richardhj\ContaoThemeFramework\Migration\ThemeMigration;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
