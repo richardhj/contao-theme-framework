@@ -31,12 +31,14 @@ class ThemeMigration implements MigrationInterface
 {
     private Connection $connection;
     private ContaoFilesystemLoader $filesystemLoader;
+    private string $rootDir;
     private string $themesPath;
 
-    public function __construct(Connection $connection, ContaoFilesystemLoader $filesystemLoader, string $themesPath)
+    public function __construct(Connection $connection, ContaoFilesystemLoader $filesystemLoader, string $rootDir, string $themesPath)
     {
         $this->connection = $connection;
         $this->filesystemLoader = $filesystemLoader;
+        $this->rootDir = $rootDir;
         $this->themesPath = $themesPath;
     }
 
@@ -178,11 +180,13 @@ class ThemeMigration implements MigrationInterface
     {
         $themeId = $id ?? null;
 
+        $themePath = str_replace($this->rootDir.'/', '', $this->themesPath);
+
         $data = [
             'name' => $name,
             'alias' => $themeName,
             'tstamp' => time(),
-            'templates' => sprintf('themes/%s/templates', $themeName),
+            'templates' => sprintf('%s/%s/templates', $themePath, $themeName),
             'manifestHash' => $manifestHash,
         ];
 

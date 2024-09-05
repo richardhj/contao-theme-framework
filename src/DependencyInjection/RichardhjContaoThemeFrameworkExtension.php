@@ -35,6 +35,6 @@ class RichardhjContaoThemeFrameworkExtension extends Extension
         }
 
         $config = $this->processConfiguration(new Configuration(), $configs);
-        $container->getDefinition(ThemeMigration::class)->replaceArgument(2, $config['themes_path']);
+        $container->getDefinition(ThemeMigration::class)->replaceArgument(3, $config['themes_path']);
     }
 }
