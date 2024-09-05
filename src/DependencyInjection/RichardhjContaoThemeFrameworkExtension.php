@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Richardhj\ContaoThemeFramework\DependencyInjection;
 
+use Ferienpass\CmsBundle\DependencyInjection\Configuration;
+use Richardhj\ContaoThemeFramework\Migration\ThemeMigration;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -27,5 +29,8 @@ class RichardhjContaoThemeFrameworkExtension extends Extension
         if ($container->hasDefinition('webpack_encore.tag_renderer')) {
             $loader->load('encore.yml');
         }
+
+        $config = $this->processConfiguration(new Configuration(), $configs);
+        $container->getDefinition(ThemeMigration::class)->replaceArgument(2, $config['themes_path']);
     }
 }

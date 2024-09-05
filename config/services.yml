@@ -33,7 +33,7 @@ services:
     arguments:
       - '@database_connection'
       - '@contao.twig.filesystem_loader'
-      - '%kernel.project_dir%'
+      - '%kernel.project_dir%/themes'
 
   Richardhj\ContaoThemeFramework\Command\CreateThemeCommand:
     arguments:

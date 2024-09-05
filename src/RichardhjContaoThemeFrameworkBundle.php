@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Richardhj\ContaoThemeFramework;
 
 use Richardhj\ContaoThemeFramework\DependencyInjection\CompilerPass\AddAssetsPackagesPass;
-use Richardhj\ContaoThemeFramework\DependencyInjection\CompilerPass\RegisterEncorePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

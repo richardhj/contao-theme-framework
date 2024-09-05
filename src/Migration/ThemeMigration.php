@@ -31,13 +31,13 @@ class ThemeMigration implements MigrationInterface
 {
     private Connection $connection;
     private ContaoFilesystemLoader $filesystemLoader;
-    private string $rootDir;
+    private string $themesPath;
 
-    public function __construct(Connection $connection, ContaoFilesystemLoader $filesystemLoader, string $rootDir)
+    public function __construct(Connection $connection, ContaoFilesystemLoader $filesystemLoader, string $themesPath)
     {
         $this->connection = $connection;
-        $this->rootDir = $rootDir;
         $this->filesystemLoader = $filesystemLoader;
+        $this->themesPath = $themesPath;
     }
 
     public function getName(): string
@@ -47,13 +47,13 @@ class ThemeMigration implements MigrationInterface
 
     public function shouldRun(): bool
     {
-        if (!file_exists($this->rootDir.'/themes')) {
+        if (!file_exists($this->themesPath)) {
             return false;
         }
 
         $manifests = (new Finder())
             ->files()
-            ->in($this->rootDir.'/themes')
+            ->in($this->themesPath)
             ->name(['theme.yml', 'theme.yaml'])
             ->getIterator()
         ;
@@ -88,7 +88,7 @@ class ThemeMigration implements MigrationInterface
     {
         $manifests = (new Finder())
             ->files()
-            ->in($this->rootDir.'/themes')
+            ->in($this->themesPath)
             ->name(['theme.yml', 'theme.yaml'])
             ->getIterator()
         ;
