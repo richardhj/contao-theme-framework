@@ -22,6 +22,7 @@ use Richardhj\ContaoThemeFramework\Configuration\YamlLoader;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -49,13 +50,14 @@ class ThemeMigration implements MigrationInterface
 
     public function shouldRun(): bool
     {
-        if (!file_exists($this->themesPath)) {
+        $themesPath = Path::join($this->rootDir, $this->themesPath);
+        if (!file_exists($themesPath)) {
             return false;
         }
 
         $manifests = (new Finder())
             ->files()
-            ->in($this->themesPath)
+            ->in($themesPath)
             ->name(['theme.yml', 'theme.yaml'])
             ->getIterator()
         ;
@@ -88,9 +90,10 @@ class ThemeMigration implements MigrationInterface
 
     public function run(): MigrationResult
     {
+        $themesPath = Path::join($this->rootDir, $this->themesPath);
         $manifests = (new Finder())
             ->files()
-            ->in($this->themesPath)
+            ->in($themesPath)
             ->name(['theme.yml', 'theme.yaml'])
             ->getIterator()
         ;
@@ -180,13 +183,11 @@ class ThemeMigration implements MigrationInterface
     {
         $themeId = $id ?? null;
 
-        $themePath = str_replace($this->rootDir.'/', '', $this->themesPath);
-
         $data = [
             'name' => $name,
             'alias' => $themeName,
             'tstamp' => time(),
-            'templates' => sprintf('%s/%s/templates', $themePath, $themeName),
+            'templates' => sprintf('%s/%s/templates', $this->themesPath, $themeName),
             'manifestHash' => $manifestHash,
         ];
 

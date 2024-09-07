@@ -23,7 +23,8 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder->getRootNode()
             ->children()
                 ->scalarNode('themes_path')
-                    ->defaultValue('%kernel.project_dir%/themes')
+                    ->defaultValue('themes')
+                    ->info('The path to the themes directory, relative to the root dir.')
                 ->end()
             ->end()
         ;
