@@ -17,12 +17,12 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlLoader extends Loader
 {
-    public function load($resource, $type = null)
+    public function load($resource, $type = null): mixed
     {
         return Yaml::parse(file_get_contents($resource));
     }
 
-    public function supports($resource, $type = null)
+    public function supports($resource, $type = null): bool
     {
         return \is_string($resource) && \in_array(pathinfo($resource, \PATHINFO_EXTENSION), ['yaml', 'yml'], true);
     }
