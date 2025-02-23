@@ -40,7 +40,7 @@ class EncoreEntrypointLookupCollection implements EntrypointLookupCollectionInte
      *
      * @throws UndefinedBuildException if the theme does not exist
      */
-    public function getEntrypointLookup(string $buildName = null): EntrypointLookupInterface
+    public function getEntrypointLookup(string|null $buildName = null): EntrypointLookupInterface
     {
         if (null === $buildName || '_default' === $buildName) {
             /** @var PageModel $pageModel */
