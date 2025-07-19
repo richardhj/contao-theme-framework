@@ -20,7 +20,8 @@
     "webmozart/path-util": "^2.3"
   },
   "require-dev": {
-    "contao/manager-plugin": "^2.7"
+    "contao/manager-plugin": "^2.7",
+    "symfony/webpack-encore-bundle": "^2.2"
   },
   "suggest": {
     "richardhj/contao-knp-menu": "Directly reference navigaiton modules in Twig templates"
