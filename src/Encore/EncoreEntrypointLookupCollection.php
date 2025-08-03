@@ -13,11 +13,11 @@ declare(strict_types=1);
 namespace Richardhj\ContaoThemeFramework\Encore;
 
 use Contao\PageModel;
+use Symfony\Component\Filesystem\Path;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookup;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupCollectionInterface;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
 use Symfony\WebpackEncoreBundle\Exception\UndefinedBuildException;
-use Webmozart\PathUtil\Path;
 
 /**
  * Aggregate the different Encore entry points that are configured via theme.yml manifests.

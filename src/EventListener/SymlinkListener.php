@@ -13,8 +13,8 @@ declare(strict_types=1);
 namespace Richardhj\ContaoThemeFramework\EventListener;
 
 use Contao\CoreBundle\Event\GenerateSymlinksEvent;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\Finder\Finder;
-use Webmozart\PathUtil\Path;
 
 /**
  * Symlinks a theme's public folder (`theme/my_theme/public`) to the web directory.
