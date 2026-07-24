@@ -15,6 +15,7 @@ namespace Richardhj\ContaoThemeFramework\Migration;
 use Contao\CoreBundle\Migration\MigrationInterface;
 use Contao\CoreBundle\Migration\MigrationResult;
 use Contao\CoreBundle\Twig\Loader\ContaoFilesystemLoader;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Richardhj\ContaoThemeFramework\Configuration\ThemeManifestConfiguration;
@@ -111,11 +112,11 @@ class ThemeMigration implements MigrationInterface
             $installed += (int) $this->persistManifest($themeName, $config, $manifestHash);
         }
 
-        $deleted = $this->connection->executeQuery(
+        $deleted = $this->connection->executeStatement(
             'DELETE FROM tl_theme WHERE alias IS NOT NULL AND alias NOT IN (:aliases)',
             ['aliases' => $aliases],
-            ['aliases' => Connection::PARAM_STR_ARRAY]
-        )->rowCount();
+            ['aliases' => ArrayParameterType::STRING]
+        );
 
         $this->filesystemLoader->warmUp(true);
 
@@ -224,10 +225,10 @@ class ThemeMigration implements MigrationInterface
 
     private function cleanUpLayouts(int $themeId, $layouts): void
     {
-        $this->connection->executeQuery(
+        $this->connection->executeStatement(
             'DELETE FROM tl_layout WHERE pid=:pid AND alias NOT IN (:aliases)',
             ['pid' => $themeId, 'aliases' => array_keys($layouts)],
-            ['aliases' => Connection::PARAM_STR_ARRAY]
+            ['aliases' => ArrayParameterType::STRING]
         );
     }
 
@@ -256,7 +257,7 @@ class ThemeMigration implements MigrationInterface
 
     private function persistImageSizeItems($imageSizeItems, $imageSizeId): void
     {
-        $this->connection->executeQuery('DELETE FROM tl_image_size_item WHERE pid=:pid', ['pid' => $imageSizeId]);
+        $this->connection->executeStatement('DELETE FROM tl_image_size_item WHERE pid=:pid', ['pid' => $imageSizeId]);
 
         foreach ($imageSizeItems as $imageSizeItem) {
             $data = array_merge($imageSizeItem, ['pid' => $imageSizeId, 'tstamp' => time()]);

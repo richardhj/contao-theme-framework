@@ -44,28 +44,28 @@ class EncoreEntryFilesTwigExtension extends AbstractExtension
         ];
     }
 
-    public function getWebpackJsFiles(string $entryName, string $entrypointName = null): array
+    public function getWebpackJsFiles(string $entryName, ?string $entrypointName = null): array
     {
         return $this->getEntrypointLookup($entrypointName)
             ->getJavaScriptFiles($entryName)
         ;
     }
 
-    public function getWebpackCssFiles(string $entryName, string $entrypointName = null): array
+    public function getWebpackCssFiles(string $entryName, ?string $entrypointName = null): array
     {
         return $this->getEntrypointLookup($entrypointName)
             ->getCssFiles($entryName)
         ;
     }
 
-    public function renderWebpackScriptTags(string $entryName, string $packageName = null, string $entrypointName = null, array $attributes = []): string
+    public function renderWebpackScriptTags(string $entryName, ?string $packageName = null, ?string $entrypointName = null, array $attributes = []): string
     {
         return $this->getTagRenderer()
             ->renderWebpackScriptTags($entryName, $packageName, $entrypointName, $attributes)
         ;
     }
 
-    public function renderWebpackLinkTags(string $entryName, string $packageName = null, string $entrypointName = null, array $attributes = []): string
+    public function renderWebpackLinkTags(string $entryName, ?string $packageName = null, ?string $entrypointName = null, array $attributes = []): string
     {
         return $this->getTagRenderer()
             ->renderWebpackLinkTags($entryName, $packageName, $entrypointName, $attributes)

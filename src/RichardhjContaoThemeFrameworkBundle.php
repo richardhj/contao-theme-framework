@@ -30,7 +30,7 @@ class RichardhjContaoThemeFrameworkBundle extends Bundle
         return new RichardhjContaoThemeFrameworkExtension();
     }
 
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new AddAssetsPackagesPass());
     }

@@ -12,30 +12,30 @@ declare(strict_types=1);
 
 namespace Richardhj\ContaoThemeFramework\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
+#[AsCommand(name: 'contao:theme:create', description: 'The theme name and directory name')]
 class CreateThemeCommand extends Command
 {
-    protected static $defaultName = 'contao:theme:create';
     private Filesystem $filesystem;
     private string $rootDir;
 
     public function __construct(Filesystem $filesystem, string $rootDir)
     {
+        parent::__construct();
+
         $this->filesystem = $filesystem;
         $this->rootDir = $rootDir;
     }
 
     protected function configure(): void
     {
-        $this
-            ->addArgument('name', InputArgument::REQUIRED, 'The theme name')
-            ->setDescription('The theme name and directory name')
-        ;
+        $this->addArgument('name', InputArgument::REQUIRED, 'The theme name');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
