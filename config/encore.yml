@@ -1,4 +1,8 @@
 services:
+  Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection:
+    arguments:
+      - '%contao.web_dir%'
+
   Richardhj\ContaoThemeFramework\Twig\EncoreEntryFilesTwigExtension:
     tags: [ 'twig.extension' ]
     arguments:

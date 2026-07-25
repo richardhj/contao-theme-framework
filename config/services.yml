@@ -44,7 +44,3 @@ services:
   Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace:
     decorates: 'contao.twig.loader.theme_namespace'
     arguments: [ '@Richardhj\ContaoThemeFramework\Twig\Loader\ThemeNamespace.inner' ]
-
-  Richardhj\ContaoThemeFramework\Encore\EncoreEntrypointLookupCollection:
-    arguments:
-      - '%contao.web_dir%'
